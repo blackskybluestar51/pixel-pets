@@ -128,6 +128,7 @@ label{font-size:13px;color:var(--mut);display:block;margin:10px 0 4px}
     <button data-fr="pat">🤚 ลูบหัว</button><button data-fr="tease">😜 หยอกล้อ</button>
     <button data-fr="feed">🍽️ ให้อาหาร</button><button data-fr="clean">🛁 ทำความสะอาด</button>
     <button data-fr="medicine" style="grid-column:1/3">💊 ป้อนยา</button>
+    <button data-fr="duel" style="grid-column:1/3">⚔️ ท้าดวลสัตว์เลี้ยงของเพื่อน</button>
   </div>
   <div id="frSub" class="hide"></div>
   <div id="frMsg" class="mut" style="margin-top:8px;min-height:20px"></div>
@@ -324,7 +325,7 @@ function chooseAnim(p,now){
 }
 
 /* ---------- Supabase (ล็อกอิน + เซฟข้ามอุปกรณ์) ---------- */
-const SUPA_URL='https://qibpchabdkbptdrginit.supabase.co', SUPA_KEY='sb_publishable_zhrOrPsGWEHLZTKz-ptCpA_Ox7Czusb';   // ← ใส่ Project URL และ anon public key จาก Supabase (Project Settings → API)
+const SUPA_URL='https://lsqjllvpjvldzhpgreeo.supabase.co', SUPA_KEY='sb_publishable_oHyiQ8e6AhlljlDxIi9L4Q_eGNjvgi7';   // ← ใส่ Project URL และ anon public key จาก Supabase (Project Settings → API)
 const KEY='pixelpets_v1';
 const sb=(SUPA_URL&&window.supabase)?supabase.createClient(SUPA_URL,SUPA_KEY):null;
 let user=null,cloudT=null;
@@ -721,9 +722,9 @@ function btAI(){const e=bt.e,p=bt.p;let sk=bSkills(e).filter(s=>e.mp>=s.cost&&!(
   return{t:'atk'}}
 function btStep(cmd){   // ประมวลผล 1 เทิร์น → คืนรายการเหตุการณ์ให้ UI เล่นทีละอัน
   const p=bt.p,e=bt.e,ev=[];bt.turn++;
-  const side=f=>f.isPet?'p':'e',push=o=>{o.s=btSnap();ev.push(o)},msg=t=>push({k:'msg',t});
-  const heal=(f,n)=>{n=Math.min(Math.round(n*(f.role==='sup'?1.2:1)),f.hpMax-f.hp);if(n>0){f.hp+=n;if(f.isPet)hs('healed',n);push({k:'heal',who:side(f),amt:n})}};
-  const addSt=(f,n,t)=>{if(f.hp<=0)return;f.st[n]=Math.max(f.st[n]||0,t);if(f.isPet&&['burn','poison','para','slow','stun'].includes(n))hs('afflicted');msg(f.name+' '+STN[n])};
+  const side=f=>f===bt.p?'p':'e',push=o=>{o.s=btSnap();ev.push(o)},msg=t=>push({k:'msg',t});
+  const heal=(f,n)=>{n=Math.min(Math.round(n*(f.role==='sup'?1.2:1)),f.hpMax-f.hp);if(n>0){f.hp+=n;if(f===p)hs('healed',n);push({k:'heal',who:side(f),amt:n})}};
+  const addSt=(f,n,t)=>{if(f.hp<=0)return;f.st[n]=Math.max(f.st[n]||0,t);if(f===p&&['burn','poison','para','slow','stun'].includes(n))hs('afflicted');msg(f.name+' '+STN[n])};
   const cleanse=f=>['burn','poison','para','slow','stun'].forEach(n=>delete f.st[n]);
   const crit=a=>Math.min(.4,.05+bEff(a,'luk')*.004+(a.isPet?a.bond*.0005:0)+(a.role==='atk'?.08:0));
   const dodge=(a,d)=>Math.min(.6,Math.max(0,Math.min(.25,.03+(bEff(d,'spd')-bEff(a,'spd'))*.005))+(d.st.evade_up?.4:0));
@@ -732,21 +733,21 @@ function btStep(cmd){   // ประมวลผล 1 เทิร์น → ค
     const cr=Math.random()<crit(a),m=mult(o.el,d.el),ig=1-(o.ign||0);
     const b=o.kind==='phys'?bEff(a,'atk')*1.6*(a.isPet?1+a.bond/1000:1)-bEff(d,'def')*ig*.8:bEff(a,'mag')*1.2+o.pow*.6-bEff(d,'def')*ig*.3;
     const dmg=Math.max(1,Math.round(Math.max(1,b)*(.9+Math.random()*.2)*m*(cr?1.5:1)*(d.defend?.5:1)*(d.role==='def'?.9:1)*(o.mul||1)*BT_DMG));
-    d.hp=Math.max(0,d.hp-dmg);if(a.isPet)hs('dealt',dmg);else hs('taken',dmg);push({k:'hit',who:side(d),dmg,cr,m});
+    d.hp=Math.max(0,d.hp-dmg);if(a===p)hs('dealt',dmg);else if(d===p)hs('taken',dmg);push({k:'hit',who:side(d),dmg,cr,m});
     msg((cr?'💥คริติคอล! ':'')+d.name+' เสียหาย '+dmg+(m>1?' · ได้ผลดีมาก!':m<1?' · ได้ผลน้อย':'')+(d.defend?' (ป้องกัน)':''))};
   const act=(f,o,c)=>{
     if(f.st.stun){delete f.st.stun;msg(f.name+' มึนงง ขยับไม่ได้!');return}
     if(f.st.para&&Math.random()<.3){msg(f.name+' ชาจนขยับไม่ได้!');return}
     if(c.t==='item'){const med=c.id==='med',h=med?.5:.15+FOODS[c.id].food/100;P.inv[c.id]--;hs('item');push({k:'act',who:'p',a:'item'});msg(f.name+' ใช้ไอเทม');
       heal(f,Math.round(f.hpMax*h));if(med)cleanse(f);else f.mp=Math.min(f.mpMax,f.mp+8);return}
-    if(c.t==='atk'){push({k:'act',who:side(f),a:'atk'});msg(f.name+' โจมตี!');if(f.isPet)hs('atk');hit(f,o,{kind:'phys',el:f.el});return}
-    if(c.t==='skill'){const s=c.s,fx=s.fx;f.mp-=s.cost;if(f.isPet){hs('skill');hs(fx.nodmg||fx.heal||fx.buf||fx.cleanse?'sup':'off')}push({k:'act',who:side(f),a:'skill',el:s.e,si:s.i});msg(f.name+' ใช้ '+s.n+'!');
+    if(c.t==='atk'){push({k:'act',who:side(f),a:'atk'});msg(f.name+' โจมตี!');if(f===p)hs('atk');hit(f,o,{kind:'phys',el:f.el});return}
+    if(c.t==='skill'){const s=c.s,fx=s.fx;f.mp-=s.cost;if(f===p){hs('skill');hs(fx.nodmg||fx.heal||fx.buf||fx.cleanse?'sup':'off')}push({k:'act',who:side(f),a:'skill',el:s.e,si:s.i});msg(f.name+' ใช้ '+s.n+'!');
       if(!fx.nodmg)for(let i=0;i<(fx.hits||1)&&o.hp>0;i++)hit(f,o,{kind:'mag',pow:s.p,el:s.e,ign:fx.ign,mul:fx.mul});
       if(fx.st&&o.hp>0&&Math.random()<fx.st[1])addSt(o,fx.st[0],fx.st[0]==='stun'?2:3);
       if(fx.heal)heal(f,Math.round(f.hpMax*fx.heal));if(fx.cleanse)cleanse(f);
       if(fx.buf){f.st[fx.buf[0]]=fx.buf[1];msg(f.name+' '+STN[fx.buf[0]])}}};
   const ec=btAI(),pairs=[[p,e,cmd],[e,p,ec]];
-  pairs.forEach(([f,o,c])=>{if(c.t==='def'){f.defend=true;if(f.isPet)hs('def');f.mp=Math.min(f.mpMax,f.mp+4);push({k:'act',who:side(f),a:'def'});msg(f.name+' ตั้งท่าป้องกัน 🛡️')}});   // ป้องกันมาก่อน
+  pairs.forEach(([f,o,c])=>{if(c.t==='def'){f.defend=true;if(f===p)hs('def');f.mp=Math.min(f.mpMax,f.mp+4);push({k:'act',who:side(f),a:'def'});msg(f.name+' ตั้งท่าป้องกัน 🛡️')}});   // ป้องกันมาก่อน
   if(cmd.t==='item')act(p,e,cmd);                                                                                                          // ไอเทมมาก่อน
   pairs.filter(x=>x[2].t==='atk'||x[2].t==='skill').sort((a,b)=>bEff(b[0],'spd')-bEff(a[0],'spd')||Math.random()-.5)                      // ที่เหลือเรียงตาม SPD
     .forEach(([f,o,c])=>{if(f.hp>0&&o.hp>0)act(f,o,c)});
@@ -757,7 +758,9 @@ function btStep(cmd){   // ประมวลผล 1 เทิร์น → ค
 function btReady(){if(P.dead)return'จากไปแล้ว';if(P.sleeping)return'กำลังหลับอยู่…';if(P.sick)return'ป่วยอยู่ รักษาก่อน';if(P.healLeft>0||P.bathing)return'กำลังทำกิจกรรมอยู่';if(P.en<20)return'พลังงานต่ำเกินไป (ต้อง ≥ 20)';return null}
 function btStart(i,boss){const err=btReady();if(err)return toast(err);if(i>0&&!(P.clr||{})[AREAS[i-1].id+'_b'])return toast('ต้องผ่านบอสด่านก่อนหน้า');
   rt.panel=null;renderPanel();P.en=clamp(P.en-15);btNew(AREAS[i],boss);btOpen()}
-function btReward(){hs(bt.win?'wins':'losses');const e=bt.e,b=bt.boss,r={win:bt.win,xp:0,coins:0,items:[],bond:0,crystal:0};
+function btReward(){hs(bt.win?'wins':'losses');
+  if(bt.duel){const o=bt.e,r={win:bt.win,xp:Math.round((8+o.lv*2)*(bt.win?1:.5)),coins:0,items:[],bond:bt.win?1:0,crystal:0};P.hap=clamp(P.hap+4);addBond(r.bond);addXp(r.xp);if(bt.win)qAdd('fight');return r}   // ดวลกับเพื่อน: EXP น้อยกว่าปกติ ไม่มีเหรียญ/ของดรอป
+  const e=bt.e,b=bt.boss,r={win:bt.win,xp:0,coins:0,items:[],bond:0,crystal:0};
   if(bt.win){r.xp=Math.round((10+e.lv*5)*(b?2.5:1));r.coins=Math.round((6+e.lv*2.5)*(b?3:1));r.bond=b?4:2;
     if(!b&&Math.random()<.25){const ks=Object.keys(FOODS);r.items.push(ks[Math.random()*ks.length|0])}
     P.clr=P.clr||{};const key=bt.area.id+(b?'_b':''),first=!P.clr[key];P.clr[key]=1;
@@ -779,7 +782,7 @@ function btLoop(t){if(!btOn||!bt)return;requestAnimationFrame(btLoop);
   const dt=Math.min(.1,(t-(bt.lt||t))/1000);bt.lt=t;const c=$('#btCv').getContext('2d'),v=bt.v,now=performance.now();c.imageSmoothingEnabled=false;
   ['#cfeaff','#dff1ff','#f4e6ff','#ffe8f4'].forEach((col,i)=>R(c,0,i*24,256,25,col));
   R(c,0,98,256,46,'#c9f0c6');R(c,0,98,256,3,'#b2e6ae');R(c,0,120,256,24,'#b9e4b6');R(c,150,100,80,5,'rgba(0,0,0,.12)');R(c,28,134,80,5,'rgba(0,0,0,.12)');
-  const ps=getSheet(P.sp,P.stage,1,accOf(P)),es=getSheet(bt.e.sp,bt.e.stage,1,EL[bt.e.el].c);
+  const ps=getSheet(P.sp,P.stage,1,accOf(P)),es=getSheet(bt.e.sp,bt.e.stage,1,bt.e.el?EL[bt.e.el].c:null);
   bt.pa.play(bt.p.hp<bt.p.hpMax*.25?'sick':'idle');bt.pa.update(dt);bt.ae.play(bt.e.hp<bt.e.hpMax*.25?'sick':'idle');bt.ae.update(dt);
   if(!(now<v.eb&&((now/50)|0)%2)){c.globalAlpha=v.ea;(drawAdFlame(c,v,'e',now,150+v.edx,8,true)||drawYgFlame(c,v,'e',now,150+v.edx,8,true)||bt.ae.draw(c,es,150+v.edx+flameLean(v,'e',now),8,6,true));c.globalAlpha=1}
   if(!(now<v.pb&&((now/50)|0)%2)){c.globalAlpha=v.pa;(drawAdFlame(c,v,'p',now,18+v.pdx,44,false)||drawYgFlame(c,v,'p',now,18+v.pdx,44,false)||bt.pa.draw(c,ps,18+v.pdx+flameLean(v,'p',now),44,6,false));c.globalAlpha=1}
@@ -888,7 +891,7 @@ function btMenu(k){let h='';
   else{h=Object.keys(FOODS).filter(x=>P.inv[x]>0).map(x=>`<div class="item"><span>${FOODS[x].n} ×${P.inv[x]}<br><span class="mut">ฟื้น HP ${Math.round((.15+FOODS[x].food/100)*100)}% · MP +8</span></span><button data-it="${x}">ใช้</button></div>`).join('')
     +(P.inv.med>0?`<div class="item"><span>${MED.n} ×${P.inv.med}<br><span class="mut">ฟื้น HP 50% · ล้างสถานะผิดปกติ</span></span><button data-it="med">ใช้</button></div>`:'');if(!h)h='<div class="mut">ไม่มีไอเทม</div>'}
   $('#btSub').innerHTML=h+'<div class="row" style="margin-top:6px"><button data-bt="back">ย้อนกลับ</button></div>';$('#btSub').classList.remove('hide')}
-function btFinish(){const r=btReward();$('#btCmd').classList.add('hide');$('#btSub').classList.add('hide');
+function btFinish(){const r=btReward();if(bt.duel)socDuelReport(r);$('#btCmd').classList.add('hide');$('#btSub').classList.add('hide');
   $('#btEnd').innerHTML=(r.win?'<b>🎉 ชนะ!</b>':'<b>💔 พ่ายแพ้…</b>')+`<div class="mut" style="margin:6px 0">EXP +${r.xp}${r.coins?' · 🪙 +'+r.coins:''}${r.items.map(k=>' · '+FOODS[k].n).join('')}${r.crystal?' · 💎 คริสตัลวิวัฒนาการ':''}${r.win?' · 🤝 ผูกพัน +'+r.bond:''}</div><button data-bt="close" class="on">ปิด</button>`;
   $('#btEnd').classList.remove('hide');update();save()}
 function btClose(){btOn=false;bt=null;$('#btModal').classList.add('hide');update();renderPanel();save()}
@@ -913,11 +916,11 @@ function applyKind(T,k,p,mine){   // ผลของการกระทำข�
   if(k==='feed'){const f=FOODS[(p||{}).food];if(!f)return null;T.food=clamp(T.food+f.food);T.hap=clamp(T.hap+f.hap+2);if(f.hp)T.hp=clamp(T.hp+f.hp,1,100);return k}
   if(k==='clean'){T.clean=clamp(T.clean+45);return k}
   if(k==='medicine'){if(T.sick){T.sick=false;T.hp=clamp(T.hp+30)}else T.hp=clamp(T.hp+5);return k}
-  if(k==='thanks')return k;
+  if(k==='thanks'||k==='duel')return k;
   return null}
 const socText=(a,pn)=>{const n=a.from_name||'เพื่อน',f=FOODS[(a.payload||{}).food];
   return({pat:n+' ลูบหัว '+pn+' 💖',tease:n+' มาหยอก '+pn+' 😆',feed:n+' ให้'+(f?f.n:'อาหาร')+'กับ '+pn+' 🍽️',clean:n+' ช่วยทำความสะอาดให้ '+pn+' 🫧 ขอบคุณเพื่อนนะ!',
-    medicine:n+' ป้อนยาให้ '+pn+' 💊 ขอบคุณเพื่อนนะ!',thanks:n+' ขอบคุณที่ช่วยดูแลสัตว์เลี้ยงของเขา 💝 (ได้แต้มมิตรภาพ +2)'})[a.kind]||''};
+    medicine:n+' ป้อนยาให้ '+pn+' 💊 ขอบคุณเพื่อนนะ!',duel:n+' มาประลองกับ '+pn+' ⚔️ — '+((a.payload||{}).win?n+' ชนะ':pn+' ป้องกันบ้านสำเร็จ! 🏆'),thanks:n+' ขอบคุณที่ช่วยดูแลสัตว์เลี้ยงของเขา 💝 (ได้แต้มมิตรภาพ +2)'})[a.kind]||''};
 function socApplyOne(a,online){
   if(!P)return;if(P.dead&&a.kind!=='thanks')return;
   if(!applyKind(P,a.kind,a.payload||{},true))return;
@@ -934,7 +937,7 @@ function socCatchUp(acts){   // จำลองเวลาที่ปิดเ
 async function socFetchInbox(){if(!socOn())return[];const r=await socCall('social_inbox');return Array.isArray(r)?r:[]}
 async function socAck(acts){const ids=(acts||[]).map(a=>a.id);if(ids.length&&socOn())await socCall('social_ack',{p_ids:ids})}
 async function socPublish(){if(!socOn()||!soc.ready||!P)return;
-  await socCall('social_publish',{p_snapshot:{name:P.name,sp:P.sp,gender:P.gender,stage:P.stage,el:P.el||null,lv:P.lv,food:Math.round(P.food),hap:Math.round(P.hap),clean:Math.round(P.clean),en:Math.round(P.en),hp:Math.round(P.hp),bond:Math.round(P.bond||0),sick:!!P.sick,sleeping:!!P.sleeping,dead:!!P.dead,trait:P.trait||null}})}
+  await socCall('social_publish',{p_snapshot:{name:P.name,sp:P.sp,gender:P.gender,stage:P.stage,el:P.el||null,lv:P.lv,food:Math.round(P.food),hap:Math.round(P.hap),clean:Math.round(P.clean),en:Math.round(P.en),hp:Math.round(P.hp),bond:Math.round(P.bond||0),sick:!!P.sick,sleeping:!!P.sleeping,dead:!!P.dead,trait:P.trait||null,role:P.role||null,sub:P.sub==null?null:P.sub,genes:P.genes||null}})}
 async function socRefresh(){if(!socOn()||!soc.ready)return;const r=await socCall('social_overview');if(!r||!r.me)return;
   soc.me=r.me;soc.incoming=r.incoming||[];soc.outgoing=r.outgoing||[];
   soc.friends=(r.friends||[]).map(f=>{const prev=soc.friends.find(o=>o.id===f.id),snapAt=Date.now()-(f.age_s||0)*1000;
@@ -993,7 +996,7 @@ function renderVisit(){const V=soc.visit;if(!V)return;const pet=V.fr.pet,{e,age}
   $('#frBars').innerHTML=bar('🍖 ความอิ่ม',e.food)+bar('💖 ความสุข',e.hap)+bar('🫧 ความสะอาด',e.clean)+bar('⚡ พลังงาน',e.en)+bar('❤️ สุขภาพ',e.hp);
   const q=k=>document.querySelector('#frAct [data-fr="'+k+'"]');
   q('clean').disabled=!(away&&e.clean<40);q('medicine').disabled=!(away&&e.sick&&(P.inv.med||0)>0);q('feed').disabled=false;
-  q('clean').title=away?'':'ต้องรอให้เจ้าของออฟไลน์';q('medicine').title=away?((P.inv.med||0)>0?'':'ต้องมียาในกระเป๋า'):'ต้องรอให้เจ้าของออฟไลน์'}
+  q('clean').title=away?'':'ต้องรอให้เจ้าของออฟไลน์';q('duel').disabled=!!btReady();q('duel').title=btReady()||'';q('medicine').title=away?((P.inv.med||0)>0?'':'ต้องมียาในกระเป๋า'):'ต้องรอให้เจ้าของออฟไลน์'}
 function visitLoop(t){if(!visitOn||!soc.visit)return;requestAnimationFrame(visitLoop);const V=soc.visit,c=$('#frCv').getContext('2d'),now=performance.now(),dt=Math.min(.1,(t-(V.lt||t))/1000);V.lt=t;
   if(now-V.lastBar>1000){V.lastBar=now;renderVisit()}
   c.imageSmoothingEnabled=false;['#cfeaff','#dff1ff','#f4e6ff','#ffe8f4'].forEach((col,i)=>R(c,0,i*21,192,22,col));R(c,0,86,192,34,'#c9f0c6');R(c,0,86,192,3,'#b2e6ae');R(c,0,104,192,16,'#b9e4b6');
@@ -1021,7 +1024,22 @@ $('#frModal').addEventListener('click',e=>{const b=e.target.closest('button');if
   if(d.frfood){$('#frSub').classList.add('hide');return socAct('feed',{food:d.frfood})}
   if(d.fr==='back')return $('#frSub').classList.add('hide');
   if(d.fr==='feed')return socFeedMenu();
+  if(d.fr==='duel')return socDuel();
   if(d.fr)return socAct(d.fr,{})});
+function friendFighter(d){   // สร้างคู่ต่อสู้จากข้อมูลสัตว์เลี้ยงของเพื่อน (ใช้สูตรสเตตัสเดียวกับเกม)
+  return petFighter({name:'🏠 '+(d.name||'เพื่อน'),sp:d.sp,stage:d.stage||0,lv:d.lv||1,el:d.el||null,el2:null,role:d.role||null,sub:d.sub==null?null:d.sub,
+    genes:d.genes||{hp:8,atk:8,def:8,spd:8,mag:8,luk:8},trait:d.trait||null,hp:d.hp==null?100:d.hp,bond:d.bond||0})}
+async function socDuel(){const V=soc.visit;if(!V||soc.busy)return;const fr=V.fr,err=btReady();
+  if(err){$('#frMsg').textContent='⚠️ '+err;return}
+  soc.busy=true;const r=await socCall('social_duel_check',{p_to:fr.id});soc.busy=false;
+  if(!r||!r.ok){$('#frMsg').textContent='⚠️ '+((r&&r.msg)||'ท้าดวลไม่ได้');return}
+  const d=r.pet;socCloseVisit();rt.panel=null;renderPanel();P.en=clamp(P.en-15);
+  bt={area:{id:'duel',n:'⚔️ ดวลกับ '+fr.name},boss:false,p:petFighter(P),e:friendFighter(d),turn:0,over:false,win:false,busy:false,log:[],duel:{to:fr.id,name:fr.name,pet:d.name||''}};btOpen()}
+async function socDuelReport(r){const D=bt&&bt.duel;if(!D||!socOn())return;
+  const res=await socCall('social_act',{p_to:D.to,p_kind:'duel',p_payload:{win:!!r.win,pet:D.pet}}),el=$('#btEnd');if(!el)return;
+  if(res&&res.ok){soc.me.points=(soc.me.points||0)+(res.gained||0);const fr=soc.friends.find(f=>f.id===D.to);if(fr)fr.pair_points=(fr.pair_points||0)+(res.gained||0);
+    el.insertAdjacentHTML('afterbegin','<div class="mut">💞 แต้มมิตรภาพ +'+res.gained+' · '+esc(D.name)+' จะได้รับแจ้งผลดวล</div>')}
+  else el.insertAdjacentHTML('afterbegin','<div class="mut">⚠️ '+esc((res&&res.msg)||'บันทึกผลดวลไม่สำเร็จ')+'</div>')}
 function drawSocFx(c,now){const f=rt.socFx;if(!f||now>f.t0+2200)return;const t=(now-f.t0)/2200,em={pat:'💖',tease:'😆',feed:'🍽️',clean:'🫧',medicine:'💊',thanks:'💝'}[f.kind]||'💬';
   c.font='16px sans-serif';c.textAlign='center';c.globalAlpha=1-t*t;for(let i=0;i<3;i++)c.fillText(em,rt.x+26+i*14,72-t*38-i*7+Math.sin(now/150+i)*3);c.globalAlpha=1}
 
