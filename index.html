@@ -288,7 +288,7 @@ function adultSheet(form,acc){
   for(let f=0;f<4;f++){tc.clearRect(0,0,16,16);drawGrave(tc,'dragon',f);c.drawImage(t,0,0,16,16,f*N+(N-96)/2,5*N+N-96,96,96)}
   cv.fr=[9,4,4,9,9,4,4];cv.cell=N;cv.pix=.2;return cv}
 /* ---------- สไลม์ Baby: ดีไซน์ใหม่ (เจลสีฟ้าเงามัน · ใบอ่อน+เชอร์รี่บนหัว · แท่นมอส · ท่านอนขดมีฟอง zZ) — วาดจากโค้ดบนช่อง 32×32 ---------- */
-const SLIME_MOSS=true;   // false = ไม่วาดแท่นมอสใต้ตัว
+const SLIME_MOSS=false;   // false = ไม่วาดแท่นมอสใต้ตัว
 const SLP={o:'#27559f',d:'#3a82d8',m:'#5db4f2',l:'#92d5ff',h:'#eaf9ff',e:'#17255a'};
 const SLP_SICK={o:'#56693a',d:'#8aa05f',m:'#b3c98a',l:'#d0e2aa',h:'#f1f8dc',e:'#3a3f26'};
 function slimeMoss(c){
@@ -327,6 +327,8 @@ function slimeEye(c,P,x,y,mode){
   else if(mode==='sleep'){[[0,0],[1,1],[2,1],[3,0]].forEach(o=>R(c,x+o[0],y+1+o[1],1,1,E))}      // ∪ หลับตา
   else if(mode==='happy'){[[0,1],[1,0],[2,0],[3,1]].forEach(o=>R(c,x+o[0],y+1+o[1],1,1,E))}      // ^ กินอร่อย
   else if(mode==='blink'){R(c,x,y+2,4,1,E)}
+  else if(mode==='sqL'){[[0,0],[1,1],[2,1],[1,2],[2,2],[0,3]].forEach(o=>R(c,x+o[0],y+o[1],1,1,E))}      // > ตาปี๋ (ตอนกระแทกพื้น)
+  else if(mode==='sqR'){[[2,0],[1,1],[0,1],[1,2],[0,2],[2,3]].forEach(o=>R(c,x+1+o[0],y+o[1],1,1,E))}    // <
   else if(mode==='sick'){R(c,x,y+1,4,2,E);R(c,x,y,4,1,'rgba(0,0,0,0)');R(c,x+1,y+1,1,1,'#ffffff')}
 }
 function slimeSprout(c,cx,top,f,sick){
@@ -343,6 +345,7 @@ function slimeSprout(c,cx,top,f,sick){
 function drawSlimeBaby(c,state,f){
   const sick=state==='sick',P=sick?SLP_SICK:SLP;
   if(SLIME_MOSS)slimeMoss(c);
+  if(state==='walk'&&(f===1||f===2)){const hw=f===1?7:5;R(c,16-hw,27,hw*2,1,'#3b5219');R(c,16-hw+1,28,hw*2-2,1,'#3b5219')}   // เงาบนพื้น เล็กลงเมื่อลอยสูง
   if(state==='sleep'){   // ท่านอนขด
     const cx=15,top=14,bot=26,rx=12.4,b=slimeBlob(c,P,cx,top-(f===2?1:0),bot,rx+(f===2?.4:0));
     for(let a=0;a<360;a+=14){const r=3.6,x=Math.round(9+Math.cos(a*Math.PI/180)*r),y=Math.round(21+Math.sin(a*Math.PI/180)*r*.9);if(a>40&&a<330)b.px(x,y,P.d)}   // ม้วนเกลียดด้านซ้าย
@@ -356,18 +359,25 @@ function drawSlimeBaby(c,state,f){
   let top=10,bot=26,rx=11,xo=0,ey=null;
   if(state==='idle'){top=[10,11,9,10][f];rx=[11,11.6,10.6,11][f]}
   if(state==='eat'){top=[10,9,10,9][f]}
-  if(state==='walk'){top=[10,8,10,12][f];bot=[26,24,26,26][f];rx=[11,10.5,11,12][f]}
+  if(state==='walk'){top=[14,8,8,15][f];bot=[26,22,21,26][f];rx=[12.3,10,11.5,12][f]}   // กระโดด: ย่อตัว → พุ่งขึ้น → ลอยสูงสุด → ลงกระแทกพื้น
   if(state==='sit'){top=12;rx=12}
   if(sick){top=11;xo=[0,-1,0,1][f]}
-  const cx=16+xo,b=slimeBlob(c,P,cx,top,bot,rx),y0=top+6;
-  const mode=sick?'sick':state==='eat'?'happy':(state==='idle'&&f===3)?'blink':'open';
-  slimeEye(c,P,cx-7,y0,mode);slimeEye(c,P,cx+3,y0,mode);
+  const jmp=state==='walk',sq=jmp&&(f===0||f===3);   // ตอนตัวแบน หน้าอยู่สูงขึ้น
+  const cx=16+xo,b=slimeBlob(c,P,cx,top,bot,rx),y0=top+(sq?4:6);
+  let mL=sick?'sick':state==='eat'?'happy':(state==='idle'&&f===3)?'blink':'open',mR=mL;
+  if(jmp&&f===0)mL='happy';                  // ขยิบตาข้างซ้าย
+  if(jmp&&f===3){mL='sqL';mR='sqR'}
+  slimeEye(c,P,cx-7,y0,mL);slimeEye(c,P,cx+3,y0,mR);
   b.px(cx-9,y0+3,P.l);b.px(cx-8,y0+3,P.l);b.px(cx+7,y0+3,P.l);b.px(cx+8,y0+3,P.l);   // แก้มฟ้าอ่อน
   const my=y0+5;
   if(state==='eat'){if(f%2===0){R(c,cx-2,my,4,3,P.e);R(c,cx-1,my+2,2,1,'#ff8fa3')}else R(c,cx-1,my,2,2,P.e)}
   else if(sick){R(c,cx-3,my+1,1,1,P.e);R(c,cx-2,my,2,1,P.e);R(c,cx,my+1,2,1,P.e);R(c,cx+2,my,1,1,P.e)}   // ปากสั่น
+  else if(jmp&&(f===1||f===3)){R(c,cx-2,my,4,2,P.e);R(c,cx-1,my+1,2,1,'#ff8fa3')}        // ปากเปิดยิ้ม/ร้องตอนกระแทก
   else{R(c,cx-3,my,1,1,P.e);R(c,cx-2,my+1,4,1,P.e);R(c,cx+2,my,1,1,P.e);R(c,cx-1,my+1,2,1,'#1b2a5e')}   // ยิ้ม
   if(!sick&&state!=='walk')[[0,0],[1,0],[-1,1],[2,1],[-1,2],[0,3],[1,3]].forEach(o=>b.px(cx-8+o[0],bot-6+o[1],P.l));   // ลายเกลียดที่ท้อง
+  if(jmp&&f===3){const W1='#b9e5ff',W2='#6bb6ee';   // น้ำกระเด็นตอนลงพื้น
+    [[2,26],[1,25],[1,24],[0,23],[0,22],[3,27]].forEach(o=>{R(c,o[0],o[1],1,1,W2);R(c,31-o[0],o[1],1,1,W2)});
+    [[2,21],[1,19],[3,18],[0,17],[2,15]].forEach(o=>{R(c,o[0],o[1],1,2,W1);R(c,31-o[0],o[1],1,2,W1)})}
   slimeSprout(c,cx,top,f,sick);
   if(sick)R(c,Math.min(31,cx+12),top+2+(f%2)*2,1,2,'#7ad7ff');
 }
@@ -1150,7 +1160,8 @@ function frame(t){
   const dt=Math.min(.1,(t-lastT)/1000||0);lastT=t;if(!P){requestAnimationFrame(frame);return}
   const now=Date.now(),a=chooseAnim(P,now);player.play(a);player.update(dt);
   if(P.healLeft>0)rt.x+=(56-rt.x)*Math.min(1,dt*4);   // เดินไปที่เตียงกลางฉาก
-  if(a==='walk'){rt.x+=rt.dir*((now<rt.playUntil&&rt.playItem==='ball')?36:22)*dt;const bp=now<rt.playUntil&&rt.playItem==='ball';
+  if(a==='walk'){rt.x+=rt.dir*((now<rt.playUntil&&rt.playItem==='ball')?36:22)*dt*(P.sp==='slime'&&P.stage===0?[0,2,2,0][player.f]:1);   // สไลม์เบบี้: เคลื่อนที่เฉพาะตอนลอยกลางอากาศ (ย่อ/ลงพื้นอยู่กับที่)
+   const bp=now<rt.playUntil&&rt.playItem==='ball';
     if(bp){if(rt.x<26)rt.dir=1;if(rt.x>86)rt.dir=-1}   // เล่นบอล: เหลือที่ให้ลูกบอลด้านข้าง
     else{if(rt.x<6){rt.x=6;rt.dir=1}if(rt.x>106){rt.x=106;rt.dir=-1}}}
   scene(t);if(P.healLeft>0)drawHealBack(ctx,now);
