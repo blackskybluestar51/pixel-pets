@@ -176,7 +176,7 @@ const hexMix=(a,b,t)=>{const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),x=
 const lumv=h=>{const[r,g,b]=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));return .299*r+.587*g+.114*b};
 /* ---------- มังกร: พิกเซลดีไซน์ของผู้ใช้ (4 ระยะ) — สีตัวเปลี่ยนตามธาตุ ท่าอื่นสร้างจากภาพเดียวด้วยโค้ด ---------- */
 const DRAGON_G=[[".....H......",".....H......","..BBBBBBB...",".BBLLBBBBB..",".BLBBBBBBB..",".BBKBBBKBBT.",".BBKBBBKBBTT",".BPPBBBPPB..",".BBBBRBBBB..","..DBBBBBD...","...DD.DD...."],[".......H........",".......H........","...BBBBBBBBB....","..BLLBBBBBBBB...","EEBLBBBBBBBBBEE.","EEBBBBBBBBBBBEE.","..BBKBBBBBKBB.TT","..BBKBBBBBKBBTT.","..BPPBBBBBBPPB..","..BBBBBRBBBBB...","...DBBBBBBBBD...","....DDDDDDDD...."],["....H.....H.....","....H.....H.....","...BBBBBBBBB....","..BLLBBBBBBBB...","EEBLBBBBBBBBBEE.","EEBBBBBBBBBBBEE.","EEBBBBBBBBBBBEE.","..BBKBBBBBKBB.TT","..BBKBBBBBKBBTT.","..BPPBBBBBBPPB..","..BBBLLRLLBBB...","...DBLLLLLBBD...","....DDDDDDDD...."],["...H.G.G.G.H....","...HGGGWGGGH....","...BBBBBBBBB....","..BLLBBBBBBBB...","FFBLBBBBBBBBBFF.","FFBBBBBBBBBBBFF.","FFBBBBBBBBBBBFF.","..BBKBBBBBKBB.TT","..BBKBBBBBKBBTT.","..BPPBBBBBBPPB..","..BBBLLRLLBBB...","...DBLLLLLBBD...","....DDDDDDDD...."]];
-const bodyWH=(sp,st)=>sp==='dragon'?[[7,8],[10,12],[14,13],[16,13]][st]:[[6,5],[8,7],[10,9],[10,9]][st];   // ขนาดตัวจริง (กว้าง,สูง) ใช้คำนวณท่านอนรักษา
+const bodyWH=(sp,st)=>sp==='dragon'?[[7,8],[10,12],[14,13],[16,13]][st]:(sp==='slime'&&st===0)?[9,7]:[[6,5],[8,7],[10,9],[10,9]][st];   // ขนาดตัวจริง (กว้าง,สูง) ใช้คำนวณท่านอนรักษา
 function drawDragon(c,st,form,state,f,acc){
   const g=DRAGON_G[st],w=g[0].length,h=g.length,sick=state==='sick',B=sick?'#c5e0a0':(acc||'#ff8fab'),dk=!sick&&lumv(B)<110;
   const pl={B,L:hexMix(B,'#ffffff',.35),D:hexMix(B,'#000000',.3),T:hexMix(B,'#000000',.3),K:dk?'#f4efff':'#241418',P:'#ff9db5',R:dk?'#ffd0d8':'#e0405a',H:'#fff0a8',E:'#c8a4f0',F:'#fff3b0',G:'#ffd23f',W:'#ffffff'};
@@ -287,8 +287,101 @@ function adultSheet(form,acc){
   const t=document.createElement('canvas');t.width=16;t.height=16;const tc=t.getContext('2d');   // ท่าตาย ใช้หลุมศพเดิม
   for(let f=0;f<4;f++){tc.clearRect(0,0,16,16);drawGrave(tc,'dragon',f);c.drawImage(t,0,0,16,16,f*N+(N-96)/2,5*N+N-96,96,96)}
   cv.fr=[9,4,4,9,9,4,4];cv.cell=N;cv.pix=.2;return cv}
+/* ---------- สไลม์ Baby: ดีไซน์ใหม่ (เจลสีฟ้าเงามัน · ใบอ่อน+เชอร์รี่บนหัว · แท่นมอส · ท่านอนขดมีฟอง zZ) — วาดจากโค้ดบนช่อง 32×32 ---------- */
+const SLIME_MOSS=true;   // false = ไม่วาดแท่นมอสใต้ตัว
+const SLP={o:'#27559f',d:'#3a82d8',m:'#5db4f2',l:'#92d5ff',h:'#eaf9ff',e:'#17255a'};
+const SLP_SICK={o:'#56693a',d:'#8aa05f',m:'#b3c98a',l:'#d0e2aa',h:'#f1f8dc',e:'#3a3f26'};
+function slimeMoss(c){
+  const cx=16,cy=28.6,rx=14,ry=3.3,inm=(x,y)=>{const dx=(x+.5-cx)/rx,dy=(y+.5-cy)/ry;return dx*dx+dy*dy<=1};
+  for(let y=24;y<32;y++)for(let x=0;x<32;x++){
+    if(!inm(x,y))continue;
+    const edge=!inm(x-1,y)||!inm(x+1,y)||!inm(x,y-1)||!inm(x,y+1);
+    let col;
+    if(edge)col='#2c3a16';
+    else if(y>=29)col='#5a4430';
+    else col=((x*7+y*13)%11<2)?'#9bbb45':((x*5+y*3)%9<2)?'#527022':'#6e9230';
+    R(c,x,y,1,1,col)}
+}
+function slimeBlob(c,P,cx,top,bot,rx){
+  const ry=(bot-top+1)*.6,yc=top+ry;
+  const inb=(x,y)=>{if(y>bot||y<0||x<0||x>31)return false;const dx=(x+.5-cx)/rx,dy=(y+.5-yc)/ry;return dx*dx+dy*dy<=1};
+  const edge=(x,y)=>!inb(x-1,y)||!inb(x+1,y)||!inb(x,y-1)||!inb(x,y+1);
+  for(let y=0;y<32;y++)for(let x=0;x<32;x++){
+    if(!inb(x,y))continue;
+    if(edge(x,y)){R(c,x,y,1,1,P.o);continue}
+    const dx=(x+.5-cx)/rx,dy=(y+.5-yc)/ry,d=dx*dx+dy*dy;
+    let col=P.m;
+    if(y>=bot-2||(d>.6&&dx+dy*.8>.35))col=P.d;          // เงาด้านล่าง/ขวา
+    else if(d>.5&&dx+dy<-.5)col=P.l;                     // ขอบสว่างซ้ายบน
+    R(c,x,y,1,1,col)}
+  const px=(x,y,col)=>{if(inb(x,y)&&!edge(x,y))R(c,Math.round(x),Math.round(y),1,1,col)};
+  const hx=Math.round(cx-6),hy=Math.round(top+2);         // ไฮไลต์เงาโค้งซ้ายบน + จุดเล็กขวาบน
+  [[1,0],[2,0],[3,0],[0,1],[-1,2],[-1,3]].forEach(o=>px(hx+o[0],hy+o[1],P.h));
+  px(Math.round(cx+5),hy+1,P.l);px(Math.round(cx+6),hy+2,P.l);
+  return{inb,edge,px}
+}
+function slimeEye(c,P,x,y,mode){
+  const E=P.e;
+  if(mode==='open'){[[1,0],[2,0],[0,1],[1,1],[2,1],[3,1],[0,2],[1,2],[2,2],[3,2],[1,3],[2,3]].forEach(o=>R(c,x+o[0],y+o[1],1,1,E));
+    R(c,x+1,y+1,1,1,'#ffffff');R(c,x+2,y+2,1,1,'#8aa2ff')}
+  else if(mode==='sleep'){[[0,0],[1,1],[2,1],[3,0]].forEach(o=>R(c,x+o[0],y+1+o[1],1,1,E))}      // ∪ หลับตา
+  else if(mode==='happy'){[[0,1],[1,0],[2,0],[3,1]].forEach(o=>R(c,x+o[0],y+1+o[1],1,1,E))}      // ^ กินอร่อย
+  else if(mode==='blink'){R(c,x,y+2,4,1,E)}
+  else if(mode==='sick'){R(c,x,y+1,4,2,E);R(c,x,y,4,1,'rgba(0,0,0,0)');R(c,x+1,y+1,1,1,'#ffffff')}
+}
+function slimeSprout(c,cx,top,f,sick){
+  const sw=[0,0,1,0][f];
+  if(sick){   // ใบเหี่ยวห้อยลง ไม่มีเชอร์รี่
+    R(c,cx,top-1,1,1,'#6b7a3a');R(c,cx,top-2,1,1,'#6b7a3a');R(c,cx-1,top-3,1,1,'#6b7a3a');
+    R(c,cx-4,top-2,3,1,'#8a9a4a');R(c,cx-5,top-1,3,1,'#76863f');R(c,cx-6,top,2,1,'#76863f');return}
+  const S='#2f7a2a',x=cx+sw;
+  R(c,cx,top-1,1,1,S);R(c,cx,top-2,1,1,S);R(c,x+1,top-3,1,1,S);R(c,x+1,top-4,1,1,S);R(c,x+2,top-4,1,1,S);                // ก้าน
+  R(c,x-4,top-4,3,1,'#58c24a');R(c,x-5,top-3,5,1,'#58c24a');R(c,x-3,top-2,3,1,'#2f9a38');            // ใบ
+  R(c,x-3,top-4,1,1,'#a6ec7a');R(c,x-4,top-3,1,1,'#a6ec7a');
+  R(c,x+3,top-8,2,1,'#d8343f');R(c,x+2,top-7,4,2,'#d8343f');R(c,x+3,top-5,2,1,'#9b1f33');R(c,x+5,top-6,1,1,'#b02535');R(c,x+2,top-7,1,1,'#ff9aa5');R(c,x+3,top-7,1,1,'#ffffff');   // เชอร์รี่
+}
+function drawSlimeBaby(c,state,f){
+  const sick=state==='sick',P=sick?SLP_SICK:SLP;
+  if(SLIME_MOSS)slimeMoss(c);
+  if(state==='sleep'){   // ท่านอนขด
+    const cx=15,top=14,bot=26,rx=12.4,b=slimeBlob(c,P,cx,top-(f===2?1:0),bot,rx+(f===2?.4:0));
+    for(let a=0;a<360;a+=14){const r=3.6,x=Math.round(9+Math.cos(a*Math.PI/180)*r),y=Math.round(21+Math.sin(a*Math.PI/180)*r*.9);if(a>40&&a<330)b.px(x,y,P.d)}   // ม้วนเกลียดด้านซ้าย
+    slimeEye(c,P,15,19,'sleep');slimeEye(c,P,21,19,'sleep');
+    R(c,19,22,2,1,P.e);b.px(13,22,P.l);b.px(14,22,P.l);b.px(24,22,P.l);b.px(25,22,P.l);
+    const by=f%2?0:1,B='#f4f4f9',O='#59586b';       // ฟอง zZ
+    R(c,20,by,10,1,O);R(c,20,by+8,10,1,O);R(c,19,by+1,1,7,O);R(c,30,by+1,1,7,O);R(c,20,by+1,10,7,B);R(c,20,by+9,1,1,O);R(c,19,by+10,1,1,O);
+    [[0,0],[1,0],[2,0],[1,1],[0,2],[1,2],[2,2]].forEach(o=>R(c,21+o[0],by+4+o[1],1,1,O));                           // z เล็ก
+    [[0,0],[1,0],[2,0],[3,0],[2,1],[1,2],[0,3],[1,3],[2,3],[3,3]].forEach(o=>R(c,25+o[0],by+1+o[1],1,1,O));         // Z ใหญ่
+    return}
+  let top=10,bot=26,rx=11,xo=0,ey=null;
+  if(state==='idle'){top=[10,11,9,10][f];rx=[11,11.6,10.6,11][f]}
+  if(state==='eat'){top=[10,9,10,9][f]}
+  if(state==='walk'){top=[10,8,10,12][f];bot=[26,24,26,26][f];rx=[11,10.5,11,12][f]}
+  if(state==='sit'){top=12;rx=12}
+  if(sick){top=11;xo=[0,-1,0,1][f]}
+  const cx=16+xo,b=slimeBlob(c,P,cx,top,bot,rx),y0=top+6;
+  const mode=sick?'sick':state==='eat'?'happy':(state==='idle'&&f===3)?'blink':'open';
+  slimeEye(c,P,cx-7,y0,mode);slimeEye(c,P,cx+3,y0,mode);
+  b.px(cx-9,y0+3,P.l);b.px(cx-8,y0+3,P.l);b.px(cx+7,y0+3,P.l);b.px(cx+8,y0+3,P.l);   // แก้มฟ้าอ่อน
+  const my=y0+5;
+  if(state==='eat'){if(f%2===0){R(c,cx-2,my,4,3,P.e);R(c,cx-1,my+2,2,1,'#ff8fa3')}else R(c,cx-1,my,2,2,P.e)}
+  else if(sick){R(c,cx-3,my+1,1,1,P.e);R(c,cx-2,my,2,1,P.e);R(c,cx,my+1,2,1,P.e);R(c,cx+2,my,1,1,P.e)}   // ปากสั่น
+  else{R(c,cx-3,my,1,1,P.e);R(c,cx-2,my+1,4,1,P.e);R(c,cx+2,my,1,1,P.e);R(c,cx-1,my+1,2,1,'#1b2a5e')}   // ยิ้ม
+  if(!sick&&state!=='walk')[[0,0],[1,0],[-1,1],[2,1],[-1,2],[0,3],[1,3]].forEach(o=>b.px(cx-8+o[0],bot-6+o[1],P.l));   // ลายเกลียดที่ท้อง
+  slimeSprout(c,cx,top,f,sick);
+  if(sick)R(c,Math.min(31,cx+12),top+2+(f%2)*2,1,2,'#7ad7ff');
+}
+function slimeBabySheet(){
+  const cv=document.createElement('canvas');cv.width=128;cv.height=224;const c=cv.getContext('2d');c.imageSmoothingEnabled=false;
+  const t=document.createElement('canvas');t.width=16;t.height=16;const tc=t.getContext('2d');
+  STATES.forEach((s,r)=>{for(let f=0;f<4;f++){c.save();c.translate(f*32,r*32);c.beginPath();c.rect(0,0,32,32);c.clip();
+    if(s==='dead'){tc.clearRect(0,0,16,16);drawGrave(tc,'slime',f);c.drawImage(t,0,0,16,16,0,0,32,32)}   // ท่าตาย ใช้หลุมศพเดิม
+    else drawSlimeBaby(c,s,f);
+    c.restore()}});
+  cv.cell=32;cv.pix=.4;return cv}
 function getSheet(sp,st,form,acc){
   const k=sp+st+form+(acc||''); if(sheets[k])return sheets[k];
+  if(sp==='slime'&&st===0)return sheets[k]=slimeBabySheet();   // สไลม์วัยเด็ก: ดีไซน์ใหม่
   if(sp==='dragon'&&st===0&&babyOK)return sheets[k]=babySheet();
   if(sp==='dragon'&&st===1&&youngOK)return sheets[k]=youngSheet(form,acc);
   if(sp==='dragon'&&st===2&&adultOK)return sheets[k]=adultSheet(form,acc);
@@ -325,7 +418,7 @@ function chooseAnim(p,now){
 }
 
 /* ---------- Supabase (ล็อกอิน + เซฟข้ามอุปกรณ์) ---------- */
-const SUPA_URL='https://qibpchabdkbptdrginit.supabase.co', SUPA_KEY='sb_publishable_zhrOrPsGWEHLZTKz-ptCpA_Ox7Czusb';   // ← ใส่ Project URL และ anon public key จาก Supabase (Project Settings → API)
+const SUPA_URL='https://lsqjllvpjvldzhpgreeo.supabase.co', SUPA_KEY='sb_publishable_oHyiQ8e6AhlljlDxIi9L4Q_eGNjvgi7';   // ← ใส่ Project URL และ anon public key จาก Supabase (Project Settings → API)
 const KEY='pixelpets_v1';
 const sb=(SUPA_URL&&window.supabase)?supabase.createClient(SUPA_URL,SUPA_KEY):null;
 let user=null,cloudT=null;
