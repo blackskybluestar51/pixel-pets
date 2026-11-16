@@ -2929,7 +2929,7 @@ function btLoop(t){if(!btOn||!bt)return;requestAnimationFrame(btLoop);
   drawDpBack(c,v,now);drawBlessLayer(c,v,now,0);drawSsLayer(c,v,now,0);drawBrLayer(c,v,now,0);drawIcwLayer(c,v,now,0);drawCwvLayer(c,v,now,0);
   if(btFwd(v)&&!(now<v.eb&&((now/50)|0)%2)){c.globalAlpha=v.ea;c.save();if(bt.e.boss){c.translate(BAX,BAY);c.scale(BK,BK);c.translate(-BAX,-BAY)};(drawAdFlame(c,v,'e',now,150+v.edx,8,true)||drawFbChar(c,v,'e',now,150+v.edx,8,true)||drawWjChar(c,v,'e',now,150+v.edx,8,true)||drawEtChar(c,v,'e',now,150+v.edx,8,true)||drawYgFlame(c,v,'e',now,150+v.edx,8,true)||drawAsFlame(c,v,'e',now,150+v.edx,8,true)||drawAsVolc(c,v,'e',now,150+v.edx,8,true)||drawLsChar(c,v,'e',now,150+v.edx,8,true)||drawDpChar(c,v,'e',now,150+v.edx,8,true)||bt.ae.draw(c,es,150+v.edx+flameLean(v,'e',now),8,6,true));c.restore();c.globalAlpha=1}
   if(!(now<v.pb&&((now/50)|0)%2)){c.globalAlpha=v.pa;(v.sw?bt.pa.draw(c,ps,18+v.pdx,44,6,!!v.pflip):drawAdFlame(c,v,'p',now,18+v.pdx,44,false)||drawFbChar(c,v,'p',now,18+v.pdx,44,false)||drawWjChar(c,v,'p',now,18+v.pdx,44,false)||drawEtChar(c,v,'p',now,18+v.pdx,44,false)||drawYgFlame(c,v,'p',now,18+v.pdx,44,false)||drawAsFlame(c,v,'p',now,18+v.pdx,44,false)||drawAsVolc(c,v,'p',now,18+v.pdx,44,false)||drawLsChar(c,v,'p',now,18+v.pdx,44,false)||drawDpChar(c,v,'p',now,18+v.pdx,44,false)||bt.pa.draw(c,ps,18+v.pdx+flameLean(v,'p',now),44,6,false));c.globalAlpha=1}
-  btMarks(c,v,now);drawFlame(c,v,now);drawFbVfx(c,v,now);drawWjVfx(c,v,now);drawEtVfx(c,v,now);drawVolcVfx(c,v,now);drawTsuVfx(c,v,now);drawQkVfx(c,v,now);drawEsVfx(c,v,now);drawDlkVfx(c,v,now);drawVtxVfx(c,v,now);drawIagVfx(c,v,now);drawIcwLayer(c,v,now,1);drawCwvLayer(c,v,now,1);drawRainVfx(c,v,now);drawLsVfx(c,v,now);drawSbVfx(c,v,now);drawBlessLayer(c,v,now,1);drawSsLayer(c,v,now,1);drawBrLayer(c,v,now,1);drawDpFront(c,v,now);
+  btMarks(c,v,now);drawFlame(c,v,now);drawFbVfx(c,v,now);drawWjVfx(c,v,now);drawEtVfx(c,v,now);drawVolcVfx(c,v,now);drawTsuVfx(c,v,now);drawQkVfx(c,v,now);drawEsVfx(c,v,now);drawDlkVfx(c,v,now);drawVtxVfx(c,v,now);drawIagVfx(c,v,now);drawIcwLayer(c,v,now,1);drawCwvLayer(c,v,now,1);drawRainVfx(c,v,now);drawLsVfx(c,v,now);drawSbVfx(c,v,now);drawCsVfx(c,v,now);drawBlessLayer(c,v,now,1);drawSsLayer(c,v,now,1);drawBrLayer(c,v,now,1);drawDpFront(c,v,now);
   c.font='bold 15px sans-serif';c.textAlign='center';v.fl=v.fl.filter(f=>now-f.t0<1000);
   v.fl.forEach(f=>{const a=(now-f.t0)/1000;c.globalAlpha=1-a*a;c.lineWidth=3;c.strokeStyle='#fff';c.strokeText(f.t,f.x,f.y-a*22);c.fillStyle=f.c;c.fillText(f.t,f.x,f.y-a*22)});c.globalAlpha=1;if(v.flash>0){c.fillStyle='rgba(255,255,255,'+Math.min(1,v.flash)+')';c.fillRect(-8,-8,272,160);v.flash=Math.max(0,v.flash-dt*2.2)}c.restore()}
 /* ฟอร์เมชันศัตรู 3 ตัว: เรียงสมมาตรซ้าย-ขวารอบแกน x=186 (ตัวกลางถอยหลังเล็กน้อย) · ตัวที่ลงมือ/ถูกโจมตีจะ "ก้าวมาช่องหน้า" ขนาดเต็ม เอฟเฟกต์ทั้งหมดเล่นที่ช่องหน้า */
@@ -3428,7 +3428,7 @@ function drawRainVfx(c,v,now){
       [-.3,0,.3].forEach((o,n)=>{const sc=(t*RAIN.fall+n*dh*.37)%dh;for(let y=top+dh*.38-dh+sc;y>-dh;y-=dh)c.drawImage(rainImg,0,0,RAIN.W,RAIN.H,cx+o*dw-dw/2,y,dw,dh)});c.restore()}   // ฝนไหลลงจากขอบบนจอ
     c.drawImage(rainImg,i*RAIN.W,0,RAIN.W,RAIN.H,cx-dw/2,top,dw,dh);
     c.restore()}}
-function volShake(v,now){const _sb=sbShake(v,now);if(_sb)return _sb;const _ss=ssShake(v,now);if(_ss)return _ss;const _ts=tsuShake(v,now);if(_ts)return _ts;const _qk=qkShake(v,now);if(_qk)return _qk;const _es=esShake(v,now);if(_es)return _es;const _dl=dlkShake(v,now);if(_dl)return _dl;const _vx=vtxShake(v,now);if(_vx)return _vx;   // จอสั่นหลังระเบิดใหญ่
+function volShake(v,now){const _sb=sbShake(v,now);if(_sb)return _sb;const _ss=ssShake(v,now);if(_ss)return _ss;const _cs=csShake(v,now);if(_cs)return _cs;const _ts=tsuShake(v,now);if(_ts)return _ts;const _qk=qkShake(v,now);if(_qk)return _qk;const _es=esShake(v,now);if(_es)return _es;const _dl=dlkShake(v,now);if(_dl)return _dl;const _vx=vtxShake(v,now);if(_vx)return _vx;   // จอสั่นหลังระเบิดใหญ่
   if(v.vo)for(const f of v.vo){const t=now-f.t0-VOL_T.vx-VOL_T.vf*3;if(t>=0&&t<500){const a=3*(1-t/500);return[Math.round(Math.sin(now/22)*a),Math.round(Math.cos(now/27)*a)]}}
   return[0,0]}
 /* ===== 🌑 สกิลเงาคม (ธาตุเงา · สกิล 1 "ใบมีดเงากรีดศัตรู") ของมังกรเงา: วัยรุ่น / ผู้ใหญ่ / Ascended — แต่ละวัยต่างกันที่จำนวนรอยฟัน · ขนาด · แรงสั่น · ควันเงา =====
@@ -3540,6 +3540,63 @@ function drawSsLayer(c,v,now,layer){
       if(fu<1){const e1=1-Math.pow(1-fu,3);draw(6,(1-fu)*.9,1+.3*e1,0,1);c.save();c.globalCompositeOperation='lighter';c.globalAlpha=(1-fu)*.8;c.strokeStyle='#e9d4ff';c.lineWidth=1.5;c.beginPath();c.ellipse(I.cx,I.cy,rx*(1+.5*e1),ry*(1+.5*e1),0,0,6.2832);c.stroke();   // แฟลร์เมื่อหลบสำเร็จ
         for(let i=0;i<10;i++){const an=i*.628+_fr(i)*.4,rr=e1*(rx*.9+_fr(i+4)*16);c.globalAlpha=1-fu;R(c,Math.round((I.cx+Math.cos(an)*rr)/2)*2,Math.round((I.cy+Math.sin(an)*rr*.8)/2)*2,2,2,SS.pal[i%3])}c.restore()}}
     c.restore()}}
+/* ===== 🌙 สกิลจันทร์เสี้ยวสังหาร (ธาตุเงา · สกิล 3 "โจมตีพิเศษทะลุการป้องกัน") ของมังกรเงา: วัยรุ่น / ผู้ใหญ่ / Ascended — ใบมีดจันทร์เสี้ยวเงาฟันผ่านเป้าหมาย + คลื่นทะลุเกราะ =====
+   assets/img/csv.png = แถบจันทร์เสี้ยว 6 เฟรม (ชีต 1872×144 · ช่อง 312×144 · ตัดพื้นเขียวแล้ว · โปร่งใส · โค้งหันขวา · ไม่ฝัง base64 โหลดจากไฟล์)
+   เฟรม: 0 เส้นคมบาง → 1 ยืดกว้าง → 2 ปะทะ+เศษคริสตัลเงา → 3 วงโค้งเต็ม → 4 พลังระเบิด+ควันม่วง → 5 สลายเป็นควัน
+   ลำดับ: มังกรพุ่งเข้าหา → จันทร์เสี้ยวฟันผ่านตามตาราง CS.st[ขั้น].sl → คลื่นวงรี+เส้นทะลุผ่านเป้าหมาย (สื่อถึงทะลุเกราะ) → ดาเมจเด้งที่ hit (ms) → มังกรถอยกลับ
+   รอยฟัน [เริ่ม ms, ทิศ(1=ฟันลง,-1=ฟันขึ้น), มุมเอียง rad, สเกล] · ปรับค่าได้ที่ CS ด้านล่าง (ใช้นาฬิกาเสมือนโหมด x1/x2/x3 อัตโนมัติ) */
+const csImg=new Image();let csOK=false;csImg.onload=()=>{csOK=true};csImg.src='assets/img/csv.png';
+const CS={cw:312,ch:144,fm:[70,70,80,95,120,150],imp:220,   // fm=เวลาต่อเฟรม (ms) · imp=เวลาที่รอยฟันถึงจังหวะปะทะ (เริ่มเฟรม 3)
+  pal:['#f4d9ff','#c18bff','#8a3dff','#3a1670','#150a28'],
+  st:{
+    1:{sl:[[0,1,-.12,.36]],lm:130,lunge:26,hit:250,total:900,glow:.5,sh:12,sk:0,dark:0,shk:0,trail:0,cut:1},                                           // วัยรุ่น: จันทร์เสี้ยวเดี่ยว
+    2:{sl:[[0,1,-.12,.4],[160,-1,.1,.45]],lm:140,lunge:38,hit:400,total:1250,glow:.6,sh:16,sk:3,dark:.22,shk:2,trail:12,cut:1},                          // ผู้ใหญ่: จันทร์เสี้ยวคู่ ลง→ขึ้น
+    3:{sl:[[0,1,-.14,.42],[170,-1,.12,.48],[340,1,-.02,.62]],lm:150,lunge:50,hit:570,total:1750,glow:.75,sh:22,sk:6,dark:.42,shk:4.4,trail:16,cut:1}   // Ascended: จันทร์เสี้ยว 3 ท่อน + ฟันใหญ่ปิด ทะลุทุกอย่าง
+  }};
+const csUse=who=>{if(!csOK||!bt||!bt.v)return false;const F=who==='p'?PF():bt.e;return !!F&&(who==='p'?PF().sp:bt.e.sp)==='dragon'&&F.stage>=1&&F.stage<=3};
+function csFrame(t){let a=0;for(let i=0;i<6;i++){a+=CS.fm[i];if(t<a)return i}return -1}
+async function csCast(e){const v=bt.v,who=e.who,key=who==='p'?'pdx':'edx',d=who==='p'?1:-1,C=CS.st[(who==='p'?PF():bt.e).stage];let tg;
+  if(who==='p')tg=(e.aoe&&v.es.length>1)?v.es.filter(q=>q.va>.01).map(q=>{const S=FORM[q.slot]||FORM[1];return[S.cx,S.fy-22]}):[bossM('e',[198,66])];
+  else tg=[[60,92]];
+  (v.cs=v.cs||[]).push({who,t0:performance.now()+C.lm,C,tg});   // t0 อยู่อนาคต = เริ่มรอยฟันหลังพุ่งถึง
+  await tw(v,key,d*C.lunge,C.lm);await sl(C.hit);
+  sl(Math.max(0,C.total-C.hit-120)).then(()=>tw(v,key,0,120))}   // ถอยกลับระหว่างดาเมจ/เอฟเฟกต์ปิดฉาก ไม่บล็อกเหตุการณ์ต่อไป
+function csShake(v,now){if(!v.cs)return null;let a=0;
+  for(const f of v.cs){const C=f.C;if(!C.shk)continue;C.sl.forEach((S,n)=>{const ti=now-f.t0-S[0]-CS.imp;if(ti>=0&&ti<220)a=Math.max(a,C.shk*(1-ti/220)*(n===C.sl.length-1?1:.55))})}
+  return a>.3?[Math.round(Math.sin(now/18)*a),Math.round(Math.cos(now/23)*a*.8)]:null}
+function drawCsVfx(c,v,now){
+  if(!csOK||!v.cs||!v.cs.length)return;v.cs=v.cs.filter(f=>now-f.t0<f.C.total+80);
+  const sq=(x,y,w,col,a)=>{c.globalAlpha=Math.max(0,Math.min(1,a));R(c,Math.round(x/2)*2,Math.round(y/2)*2,w,w,col);c.globalAlpha=1};
+  for(const f of v.cs){const C=f.C,t=now-f.t0,who=f.who,dir=who==='p'?1:-1,tdx=who==='p'?(v.edx||0):(v.pdx||0),last=C.sl.length-1,cdx=who==='p'?(v.pdx||0):(v.edx||0),B=who==='p'?[66,92]:[198,56];
+    // เงาไหลตามหลังมังกรตอนพุ่ง (ผู้ใหญ่/Ascended)
+    if(C.trail&&Math.abs(cdx)>4){const g=c.createLinearGradient(B[0],0,B[0]+cdx,0);g.addColorStop(0,'rgba(80,30,190,0)');g.addColorStop(1,'rgba(160,90,255,.4)');
+      c.save();c.globalCompositeOperation='lighter';c.strokeStyle=g;c.lineWidth=C.trail;c.lineCap='round';c.beginPath();c.moveTo(B[0],B[1]);c.lineTo(B[0]+cdx,B[1]);c.stroke();c.restore()}
+    if(t<0)continue;
+    // ฉากมืดลงรอบเป้าหมายระหว่างฟัน
+    if(C.dark){const u=Math.min(1,t/C.total),a=C.dark*Math.sin(Math.PI*u),T0=f.tg[0],g=c.createRadialGradient(T0[0]+tdx,T0[1],20,T0[0]+tdx,T0[1],190);
+      g.addColorStop(0,'rgba(18,0,36,0)');g.addColorStop(1,'rgba(18,0,36,'+a.toFixed(3)+')');c.save();c.fillStyle=g;c.fillRect(-8,-8,272,160);c.restore()}
+    for(let k=0;k<f.tg.length;k++){const T=f.tg[k],cx=T[0]+tdx,cy=T[1],sm=f.tg.length>1?.8:1;
+      C.sl.forEach((S,n)=>{const ts=t-S[0];if(ts<0)return;const i=csFrame(ts),ti=ts-CS.imp;
+        if(i>=0){const w=CS.cw*S[3]*sm,h=CS.ch*S[3]*sm,fa=i===5?Math.max(0,1-(ts-(CS.fm[0]+CS.fm[1]+CS.fm[2]+CS.fm[3]+CS.fm[4]))/CS.fm[5]*.8):1,
+            ox=dir*(n===1?-5:n===2?4:0)*S[3],oy=n===1?6:n===2?-2:0;
+          c.save();c.imageSmoothingEnabled=true;c.translate(cx+ox-dir*20*S[3]*sm,cy+oy);c.scale(dir,S[1]);c.rotate(S[2]);c.globalAlpha=fa;
+          c.drawImage(csImg,i*CS.cw,0,CS.cw,CS.ch,-w/2,-h/2,w,h);                                   // ชั้นปกติ: เห็นชัดบนพื้นสว่าง
+          c.globalCompositeOperation='lighter';c.globalAlpha=C.glow*fa;c.drawImage(csImg,i*CS.cw,0,CS.cw,CS.ch,-w/2,-h/2,w,h);c.restore()}   // ชั้นเรืองแสง
+        if(ti>=0&&ti<420){const u=ti/420,e1=1-Math.pow(1-u,3);
+          if(ti<150){const q=ti/150,L=64*S[3]*sm,th=S[1]>0?.55:-.55,vx=dir*Math.cos(th)*L,vy=Math.sin(th)*L;   // เส้นคมสว่างวาบตามแนวฟัน
+            c.save();c.globalCompositeOperation='lighter';c.lineCap='round';c.globalAlpha=(1-q)*.9;c.strokeStyle='#8a3dff';c.lineWidth=5*(1-q)+1;c.beginPath();c.moveTo(cx-vx,cy-vy);c.lineTo(cx+vx,cy+vy);c.stroke();
+            c.strokeStyle='#fff';c.lineWidth=2*(1-q)+.5;c.stroke();
+            const g=c.createRadialGradient(cx,cy,0,cx,cy,30*S[3]*sm+14);g.addColorStop(0,'rgba(240,210,255,'+(.8*(1-q)).toFixed(3)+')');g.addColorStop(1,'rgba(120,50,255,0)');c.fillStyle=g;c.globalAlpha=1;c.fillRect(cx-60,cy-60,120,120);c.restore()}
+          if(n===last&&ti<340){const q=ti/340,e2=1-Math.pow(1-q,3);   // คลื่นทะลุเกราะ: วงรีขยาย + ลำแสงแนวตั้งทะลุผ่านเป้าหมาย
+            c.save();c.globalCompositeOperation='lighter';c.lineCap='round';c.globalAlpha=(1-q)*.9;c.strokeStyle='#d9b8ff';c.lineWidth=2.2*(1-q)+.5;c.beginPath();c.ellipse(cx,cy,10+e2*58*S[3]*sm+8,(10+e2*58*S[3]*sm+8)*.62,0,0,6.2832);c.stroke();
+            c.globalAlpha=(1-q)*.8;c.strokeStyle='#fff';c.lineWidth=3*(1-q)+.5;c.beginPath();c.moveTo(cx,cy-34-e2*14);c.lineTo(cx,cy+34+e2*14);c.stroke();c.restore()}
+          for(let j=0;j<C.sh;j++){const r1=_fr(j*3.1+n*17+k*5),r2=_fr(j*7.7+n*5+k),an=j/C.sh*6.2832+r1,rr=e1*(12+r2*30)*(.7+S[3]*.6);   // เศษเงากระเด็น
+            sq(cx+Math.cos(an)*rr*dir*1.2,cy+Math.sin(an)*rr*.8+u*u*12,j%4?2:4,CS.pal[(j+n)%5],1-u)}
+          if(n===last)for(let j=0;j<C.sk;j++){const a=(ti-j*55)/520;if(a<0||a>1)continue;const r1=_fr(j*5.3+k),sz=6+((a*3)|0)*2;   // ควันเงาลอยขึ้น
+            sq(cx+(r1-.5)*52,cy+22-a*34,sz,j%2?'#1c0b36':'#5b2bb0',.75*(1-a))}
+          if(n===last&&C.sk){const a=Math.min(1,ti/380);c.save();c.globalAlpha=.55*(1-a);c.fillStyle='#120024';c.beginPath();c.ellipse(cx,cy+30,12+a*40,3+a*7,0,0,6.2832);c.fill();
+            c.globalAlpha=.7*(1-a);c.strokeStyle='#a66bff';c.lineWidth=1.5;c.beginPath();c.ellipse(cx,cy+30,12+a*46,3+a*8,0,0,6.2832);c.stroke();c.restore()}}   // วงเงาที่พื้นใต้เป้าหมาย
+      })}}}
 /* ===== สกิลประกายแสง (ธาตุแสง · สกิล 1) ของมังกรวัยรุ่นธาตุแสง: ตัวละคร 8 เฟรม + VFX 8 เฟรม ใช้ Timeline เดียวกัน =====
    assets: lightSparkleCast.png (ชีต 960×80 · ช่อง 120×80 · ตัดพื้นเขียวแล้ว · หันขวา) · lightSparkleVfx.png (ชีต 800×154 · ช่อง 100×154 · แปลงพื้นดำเป็นโปร่งใส ตัดเส้นแบ่งเฟรมแล้ว)
    ลำดับ: ผู้เล่นกดสกิล → lightSparkleCast เล่น (ไม่วนลูป) → ถึงเฟรมท่าปล่อยพลัง (LS.vfxFrom) เริ่ม lightSparkleEffect → VFX ครบ 8 เฟรมขณะมังกรยังค้างท่า → มังกรกลับ idle · ปรับค่าได้ที่ LS */
@@ -3822,6 +3879,7 @@ async function btPlay(ev){const v=bt.v,fl=(w,t,c)=>v.fl.push({x:w==='e'?186:58,y
     else if(e.k==='act'&&e.a==='skill'&&e.el==='light'&&e.si===1&&blOKfor(e.who)){v.bl=(v.bl||[]).filter(q=>q.who!==e.who||(q.f&&q.f!==e.f));v.bl.push({who:e.who,t0:performance.now(),f:e.who==='e'?e.f:null});lightSfx(e,'bl',0,BL.speed);await sl(BL.total/BL.speed)}   // พรศักดิ์สิทธิ์: ออร่ารอบตัว แล้วค้างเป็นบัฟจนจบการต่อสู้
     else if(e.k==='act'&&e.a==='skill'&&e.el==='shadow'&&e.si===1&&ssUse(e.who,e.f)){ssCast(e);await sl(SS.cast)}   // ก้าวย่างเงา (สกิล 2) มังกรเงา วัยรุ่น/ผู้ใหญ่/Ascended: โล่เงาก่อตัวบนตัวผู้ร่าย ค้างจนบัฟหลบหมด
     else if(e.k==='evade_end'){ssEnd(e)}   // บัฟหลบหมดอายุ: โล่แตกเป็นเศษเงาและจางหาย
+    else if(e.k==='act'&&e.a==='skill'&&e.el==='shadow'&&e.si===2&&csUse(e.who)){await csCast(e)}   // จันทร์เสี้ยวสังหาร (สกิล 3) มังกรเงา วัยรุ่น/ผู้ใหญ่/Ascended: พุ่งเข้าหา → จันทร์เสี้ยวเงาฟันผ่าน + คลื่นทะลุเกราะ → ดาเมจเด้งที่จังหวะปะทะ → ถอยกลับ
     else if(e.k==='act'&&e.a==='skill'&&e.el==='shadow'&&e.si===0&&sbUse(e.who)){await sbCast(e)}   // เงาคม (สกิล 1) มังกรเงา วัยรุ่น/ผู้ใหญ่/Ascended: พุ่งเข้าหา → ใบมีดเงากรีดศัตรู (1/2/3 ท่อนตามวัย) → ดาเมจเด้งที่จังหวะปะทะ → ถอยกลับ
     else if(e.k==='act'&&e.a==='skill'&&e.el==='light'&&e.si===0&&lsOK(e.who)){if((e.who==='p'?PF():bt.e).stage===1){(v.ls=v.ls||[]).push({who:e.who,t0:performance.now()});lightSfx(e,'ls',0);await sl(LS.total)}   // ประกายแสง วัยรุ่น: ตัวละคร+VFX ใน Timeline เดียว
       else{const key=e.who==='p'?'pdx':'edx',d=e.who==='p'?1:-1;await tw(v,key,d*24,150);(v.ls=v.ls||[]).push({who:e.who,t0:performance.now()-LS.vfxStart,vo:true});lightSfx(e,'ls',LS.vfxStart/1000-.05);await sl(LS.vfxMs*8+120);await tw(v,key,0,110)}}   // ผู้ใหญ่: ก้าวเข้าหา → VFX ที่ตัวเป้าหมาย → ถอยกลับ
