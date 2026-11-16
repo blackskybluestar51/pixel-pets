@@ -2929,7 +2929,7 @@ function btLoop(t){if(!btOn||!bt)return;requestAnimationFrame(btLoop);
   drawDpBack(c,v,now);drawBlessLayer(c,v,now,0);drawSsLayer(c,v,now,0);drawBrLayer(c,v,now,0);drawIcwLayer(c,v,now,0);drawCwvLayer(c,v,now,0);
   if(btFwd(v)&&!(now<v.eb&&((now/50)|0)%2)){c.globalAlpha=v.ea;c.save();if(bt.e.boss){c.translate(BAX,BAY);c.scale(BK,BK);c.translate(-BAX,-BAY)};(drawAdFlame(c,v,'e',now,150+v.edx,8,true)||drawFbChar(c,v,'e',now,150+v.edx,8,true)||drawWjChar(c,v,'e',now,150+v.edx,8,true)||drawEtChar(c,v,'e',now,150+v.edx,8,true)||drawYgFlame(c,v,'e',now,150+v.edx,8,true)||drawAsFlame(c,v,'e',now,150+v.edx,8,true)||drawAsVolc(c,v,'e',now,150+v.edx,8,true)||drawLsChar(c,v,'e',now,150+v.edx,8,true)||drawDpChar(c,v,'e',now,150+v.edx,8,true)||bt.ae.draw(c,es,150+v.edx+flameLean(v,'e',now),8,6,true));c.restore();c.globalAlpha=1}
   if(!(now<v.pb&&((now/50)|0)%2)){c.globalAlpha=v.pa;(v.sw?bt.pa.draw(c,ps,18+v.pdx,44,6,!!v.pflip):drawAdFlame(c,v,'p',now,18+v.pdx,44,false)||drawFbChar(c,v,'p',now,18+v.pdx,44,false)||drawWjChar(c,v,'p',now,18+v.pdx,44,false)||drawEtChar(c,v,'p',now,18+v.pdx,44,false)||drawYgFlame(c,v,'p',now,18+v.pdx,44,false)||drawAsFlame(c,v,'p',now,18+v.pdx,44,false)||drawAsVolc(c,v,'p',now,18+v.pdx,44,false)||drawLsChar(c,v,'p',now,18+v.pdx,44,false)||drawDpChar(c,v,'p',now,18+v.pdx,44,false)||bt.pa.draw(c,ps,18+v.pdx+flameLean(v,'p',now),44,6,false));c.globalAlpha=1}
-  btMarks(c,v,now);drawFlame(c,v,now);drawFbVfx(c,v,now);drawWjVfx(c,v,now);drawEtVfx(c,v,now);drawVolcVfx(c,v,now);drawTsuVfx(c,v,now);drawQkVfx(c,v,now);drawEsVfx(c,v,now);drawDlkVfx(c,v,now);drawVtxVfx(c,v,now);drawIagVfx(c,v,now);drawIcwLayer(c,v,now,1);drawCwvLayer(c,v,now,1);drawRainVfx(c,v,now);drawLsVfx(c,v,now);drawSbVfx(c,v,now);drawCsVfx(c,v,now);drawBlessLayer(c,v,now,1);drawSsLayer(c,v,now,1);drawBrLayer(c,v,now,1);drawDpFront(c,v,now);
+  btMarks(c,v,now);drawFlame(c,v,now);drawFbVfx(c,v,now);drawFfVfx(c,v,now);drawWjVfx(c,v,now);drawEtVfx(c,v,now);drawVolcVfx(c,v,now);drawTsuVfx(c,v,now);drawQkVfx(c,v,now);drawEsVfx(c,v,now);drawDlkVfx(c,v,now);drawVtxVfx(c,v,now);drawIagVfx(c,v,now);drawIcwLayer(c,v,now,1);drawCwvLayer(c,v,now,1);drawRainVfx(c,v,now);drawLsVfx(c,v,now);drawSbVfx(c,v,now);drawCsVfx(c,v,now);drawBlessLayer(c,v,now,1);drawSsLayer(c,v,now,1);drawBrLayer(c,v,now,1);drawDpFront(c,v,now);
   c.font='bold 15px sans-serif';c.textAlign='center';v.fl=v.fl.filter(f=>now-f.t0<1000);
   v.fl.forEach(f=>{const a=(now-f.t0)/1000;c.globalAlpha=1-a*a;c.lineWidth=3;c.strokeStyle='#fff';c.strokeText(f.t,f.x,f.y-a*22);c.fillStyle=f.c;c.fillText(f.t,f.x,f.y-a*22)});c.globalAlpha=1;if(v.flash>0){c.fillStyle='rgba(255,255,255,'+Math.min(1,v.flash)+')';c.fillRect(-8,-8,272,160);v.flash=Math.max(0,v.flash-dt*2.2)}c.restore()}
 /* ฟอร์เมชันศัตรู 3 ตัว: เรียงสมมาตรซ้าย-ขวารอบแกน x=186 (ตัวกลางถอยหลังเล็กน้อย) · ตัวที่ลงมือ/ถูกโจมตีจะ "ก้าวมาช่องหน้า" ขนาดเต็ม เอฟเฟกต์ทั้งหมดเล่นที่ช่องหน้า */
@@ -3029,6 +3029,48 @@ function drawFbVfx(c,v,now){
       for(let n=0;n<3;n++){const a=(t-FB.p3-n*150)/520;if(a<0||a>1)continue;const r=4+((a*3)|0)*2,px=M[0]+dir*(2+a*9),py=M[1]-3-a*18;
         sq(px,py,r,'#e6e2ee',.8*(1-a));sq(px+dir*r*.5,py-r*.4,r*.6,'#b9b3c9',.7*(1-a))}}
   }}
+/* ===== 🔥👊 สกิลหมัดเพลิง (ไฟ · สกิล 2 · โจมตีแรงพร้อมเผา) ของมังกรไฟ Adult / Ascended: หมัดเพลิงพุ่งจากผู้ร่ายไปหาศัตรู → ปะทะ ระเบิดไฟ + จอสั่น → เปลวไฟลุกไหม้ที่ตัวศัตรูต่อเนื่อง =====
+   VFX: ไฟล์ภายนอก assets/img/fire_fist.png (ไม่ฝัง base64) · ชีต 1176×56 · ช่อง 168×56 · 7 เฟรม · ตัดพื้นเขียวแล้ว · หันขวา (ฝั่งศัตรูพลิกซ้าย-ขวาให้เอง)
+   เฟรม 0–3 หมัดพุ่ง (ปลายเล็บอยู่ที่ (hx,hy)=(130,28) ทุกเฟรม) · 4 หมัดกระแทก+ไฟระเบิด (จุดเดียวกัน) · 5–6 ไฟระเบิดกระจายตามพื้น (กึ่งกลางล่างอยู่ที่ (gx,gy)=(84,54))
+   สถานะ "ไหม้" ตั้งค่าไว้ที่ SKFX.fire[1] อยู่แล้ว · ปรับจังหวะ/ขนาด/ตำแหน่งได้ที่ค่าคงที่ FF */
+const ffImg=new Image();let ffOK=false;ffImg.onload=()=>{ffOK=true};ffImg.src='assets/img/fire_fist.png';
+const FF={W:168,H:56,hx:130,hy:28,gx:84,gy:54,ms:[70,70,80,90],imp:[90,110,150],burn:1000,fade:300,hit:350,shake:3,ks:[0,0,.8,1],
+  xE:198,yE:70,xP:66,yP:104,sE:[168,64],sP:[92,94],gyOff:30,hd:8};   // ms=เวลาเฟรมหมัดพุ่ง 0–3 · imp=เวลาเฟรม 4/5/6 ตอนปะทะ · burn/fade=เวลาไฟลุกไหม้/จาง · hit=เวลาที่ดาเมจเด้ง · ks=ขนาดตามวัย (Baby/Young/Adult/Ascended) · (xE,yE)/(xP,yP)=กลางลำตัวศัตรู/ผู้เล่น · sE/sP=จุดเริ่มหมัดของศัตรู/ผู้เล่น · gyOff=เส้นพื้นใต้จุดกลางลำตัว
+FF.tf=FF.ms.reduce((a,b)=>a+b,0);FF.ti=FF.imp.reduce((a,b)=>a+b,0);FF.bs0=FF.tf+60;FF.total=FF.bs0+FF.burn+FF.fade;
+const ffUse=who=>ffOK&&(who==='p'?PF().sp:bt.e.sp)==='dragon'&&(who==='p'?PF().el:bt.e.el)==='fire'&&(who==='p'?PF():bt.e).stage>=2;
+function ffCast(e){const v=bt.v,who=e.who,stg=who==='p'?PF().stage:bt.e.stage,bs=who==='p'&&bt.e&&bt.e.boss?BK:1;
+  const T=who==='p'?bossM('e',[FF.xE,FF.yE]):[FF.xP,FF.yP];   // ผู้เล่นร่าย → ปะทะที่ศัตรู · ศัตรูร่าย → ปะทะที่ผู้เล่น
+  (v.ff=v.ff||[]).push({who,t0:performance.now(),T,S:who==='p'?FF.sP:FF.sE,k:(FF.ks[stg]||1)*bs,bs,fl:0})}
+function ffShake(v,now){if(v.ff)for(const f of v.ff){const t=now-f.t0-FF.tf;if(t>=0&&t<260){const a=FF.shake*(1-t/260);return[Math.round(Math.sin(now/15)*a),Math.round(Math.cos(now/19)*a*.8)]}}return null}
+function drawFfVfx(c,v,now){
+  if(!ffOK||!v.ff)return;v.ff=v.ff.filter(f=>now-f.t0<FF.total+60);
+  for(const f of v.ff){const t=now-f.t0;if(t<0||t>=FF.total)continue;const dir=f.who==='p'?1:-1,T=f.T,S=f.S,k=f.k,bs=f.bs,tf=FF.tf,E=[T[0]+dir*FF.hd*k,T[1]-2];
+    const cell=(i,ax,ay,x,y,s,a,ang)=>{c.save();c.imageSmoothingEnabled=true;c.globalAlpha=Math.max(0,Math.min(1,a));c.translate(x,y);c.scale(dir,1);c.rotate(ang||0);c.scale(s,s);c.drawImage(ffImg,i*FF.W,0,FF.W,FF.H,-ax,-ay,FF.W,FF.H);c.restore()};
+    const ang=Math.atan2(E[1]-S[1],Math.abs(E[0]-S[0])),pos=q=>{const u=Math.pow(Math.max(0,Math.min(1,q/tf)),1.6);return[S[0]+(E[0]-S[0])*u,S[1]+(E[1]-S[1])*u,u]};
+    if(t<tf){let i=0,a=0;while(i<FF.ms.length-1&&t>=a+FF.ms[i]){a+=FF.ms[i];i++}
+      const[px,py,u]=pos(t),sc=k*(.7+.3*Math.min(1,u*2.5)),al=Math.min(1,t/50);
+      for(let j=3;j>=1;j--){const q=pos(Math.max(0,t-j*28));cell(i,FF.hx,FF.hy,q[0],q[1],sc*(1-j*.05),al*(.34-j*.08),ang)}   // ภาพตามหลัง
+      cell(i,FF.hx,FF.hy,px,py,sc,al,ang)}
+    else{const ti=t-tf;
+      if(!f.fl){f.fl=1;v.flash=Math.max(v.flash||0,.3)}   // วาบขาวตอนหมัดกระแทก
+      const gy0=T[1]+FF.gyOff*bs;
+      if(ti<FF.imp[0])cell(4,FF.hx,FF.hy,E[0],E[1],k,1,0);
+      else if(ti<FF.imp[0]+FF.imp[1])cell(5,FF.gx,FF.gy,T[0],gy0,k,1,0);
+      else if(ti<FF.ti){const u=(ti-FF.imp[0]-FF.imp[1])/FF.imp[2];cell(6,FF.gx,FF.gy,T[0],gy0,k*(1+.05*u),1-u*u,0)}}
+    const tb=t-FF.bs0;   // เปลวไฟลุกไหม้ที่ตัวเป้าหมาย (ตรงกับสถานะ "ไหม้")
+    if(tb>=0&&tb<FF.burn+FF.fade){const fo=tb<180?tb/180:tb>FF.burn?Math.max(0,1-(tb-FF.burn)/FF.fade):1,foot=T[1]+FF.gyOff*bs,w=22*bs,h=46*bs,cols=['#fff3a0','#ffb52e','#ff6a1a','#c8321a'];
+      c.save();c.globalCompositeOperation='lighter';c.globalAlpha=fo*(.16+.06*Math.sin(tb/70));c.fillStyle='#ff7a1a';c.beginPath();c.ellipse(T[0],T[1]+4,26*bs,30*bs,0,0,7);c.fill();c.restore();   // แสงไฟส้มเรืองรอบตัว
+      for(let j=0;j<18;j++){const life=520+(j%3)*60,tt=tb+j*61,ph=(tt%life)/life,cy=(tt/life)|0,x=T[0]+(_fr(j+cy*3)-.5)*2*w*(1-ph*.4),y=foot-ph*h*(.55+_fr(j+9)*.6);
+        c.globalAlpha=Math.max(0,(1-ph)*fo);R(c,Math.round(x/2)*2,Math.round(y/2)*2,ph<.5?4:2,ph<.5?4:2,cols[Math.min(3,(ph*4)|0)])}
+      c.globalAlpha=1}}}
+function ffSfx(e){try{if(e&&e.who!=='p'&&typeof FSFX_ENEMY!=='undefined'&&!FSFX_ENEMY)return;if(typeof sndOn==='function'&&!sndOn())return;   // เสียงหมัดเพลิง: ลมไฟหวีดตอนพุ่ง → กระแทกก้อง + ไฟระเบิดแตก → ไฟลุกเปรี๊ยะๆ (สังเคราะห์ด้วย WebAudio)
+  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;if(!qkAc)qkAc=new AC();const ac=qkAc;if(ac.state==='suspended')ac.resume();
+  const T=ac.currentTime,V=.32,tf=FF.tf/1000,nb=d=>{const b=ac.createBuffer(1,Math.max(1,Math.floor(ac.sampleRate*d)),ac.sampleRate),x=b.getChannelData(0);for(let k=0;k<x.length;k++)x[k]=Math.random()*2-1;return b};
+  const w=ac.createBufferSource();w.buffer=nb(tf+.6);const bp=ac.createBiquadFilter();bp.type='bandpass';bp.Q.value=.8;bp.frequency.setValueAtTime(350,T);bp.frequency.exponentialRampToValueAtTime(1900,T+tf);bp.frequency.exponentialRampToValueAtTime(500,T+tf+.5);
+  const g=ac.createGain();g.gain.setValueAtTime(0,T);g.gain.linearRampToValueAtTime(.75*V,T+tf);g.gain.exponentialRampToValueAtTime(.001,T+tf+.55);w.connect(bp);bp.connect(g);g.connect(ac.destination);w.start(T);   // ลมไฟ
+  const o=ac.createOscillator(),og=ac.createGain();o.type='sine';o.frequency.setValueAtTime(150,T+tf);o.frequency.exponentialRampToValueAtTime(42,T+tf+.38);og.gain.setValueAtTime(0,T+tf);og.gain.linearRampToValueAtTime(.95*V,T+tf+.012);og.gain.exponentialRampToValueAtTime(.001,T+tf+.4);o.connect(og);og.connect(ac.destination);o.start(T+tf);o.stop(T+tf+.45);   // กระแทกก้อง
+  const s=ac.createBufferSource();s.buffer=nb(.3);const hp=ac.createBiquadFilter();hp.type='highpass';hp.frequency.value=1400;const sg=ac.createGain();sg.gain.setValueAtTime(.8*V,T+tf);sg.gain.exponentialRampToValueAtTime(.001,T+tf+.28);s.connect(hp);hp.connect(sg);sg.connect(ac.destination);s.start(T+tf);   // ไฟระเบิดแตก
+  for(let n=0;n<22;n++){const t=tf+.12+n*.046+Math.random()*.02,c2=ac.createBufferSource();c2.buffer=nb(.04);const h2=ac.createBiquadFilter();h2.type='highpass';h2.frequency.value=2500+Math.random()*2500;const cg=ac.createGain();cg.gain.setValueAtTime((.3-n*.009)*V*(.5+Math.random()*.5),T+t);cg.gain.exponentialRampToValueAtTime(.001,T+t+.04);c2.connect(h2);h2.connect(cg);cg.connect(ac.destination);c2.start(T+t)}}catch(err){}}   // ไฟลุกเปรี๊ยะๆ
 /* ===== 💧 สกิลสายน้ำ (น้ำ · สกิล 1) ของมังกรน้ำวัยรุ่น: 4 ท่า + สายน้ำพุ่งไปหาเป้าหมาย =====
    ชีตมังกร 448×96 · ช่อง 112×96 (กล่องสไปรต์ 80×80 อยู่ที่ (8,16) เหมือนสไปรต์ Young เดิม · ขยายขวาไว้ให้สายน้ำช่วงปาก)
    ท่า: 0 สูดน้ำ (ละอองรวมที่ปาก) → 1 อ้าปากพ่นน้ำเม็ดแรก → 2 สายน้ำพุ่งออก → 3 สายน้ำเต็มกำลัง (ตัวถอยหลังเล็กน้อย)
@@ -3428,7 +3470,7 @@ function drawRainVfx(c,v,now){
       [-.3,0,.3].forEach((o,n)=>{const sc=(t*RAIN.fall+n*dh*.37)%dh;for(let y=top+dh*.38-dh+sc;y>-dh;y-=dh)c.drawImage(rainImg,0,0,RAIN.W,RAIN.H,cx+o*dw-dw/2,y,dw,dh)});c.restore()}   // ฝนไหลลงจากขอบบนจอ
     c.drawImage(rainImg,i*RAIN.W,0,RAIN.W,RAIN.H,cx-dw/2,top,dw,dh);
     c.restore()}}
-function volShake(v,now){const _sb=sbShake(v,now);if(_sb)return _sb;const _ss=ssShake(v,now);if(_ss)return _ss;const _cs=csShake(v,now);if(_cs)return _cs;const _ts=tsuShake(v,now);if(_ts)return _ts;const _qk=qkShake(v,now);if(_qk)return _qk;const _es=esShake(v,now);if(_es)return _es;const _dl=dlkShake(v,now);if(_dl)return _dl;const _vx=vtxShake(v,now);if(_vx)return _vx;   // จอสั่นหลังระเบิดใหญ่
+function volShake(v,now){const _ff=ffShake(v,now);if(_ff)return _ff;const _sb=sbShake(v,now);if(_sb)return _sb;const _ss=ssShake(v,now);if(_ss)return _ss;const _cs=csShake(v,now);if(_cs)return _cs;const _ts=tsuShake(v,now);if(_ts)return _ts;const _qk=qkShake(v,now);if(_qk)return _qk;const _es=esShake(v,now);if(_es)return _es;const _dl=dlkShake(v,now);if(_dl)return _dl;const _vx=vtxShake(v,now);if(_vx)return _vx;   // จอสั่นหลังระเบิดใหญ่
   if(v.vo)for(const f of v.vo){const t=now-f.t0-VOL_T.vx-VOL_T.vf*3;if(t>=0&&t<500){const a=3*(1-t/500);return[Math.round(Math.sin(now/22)*a),Math.round(Math.cos(now/27)*a)]}}
   return[0,0]}
 /* ===== 🌑 สกิลเงาคม (ธาตุเงา · สกิล 1 "ใบมีดเงากรีดศัตรู") ของมังกรเงา: วัยรุ่น / ผู้ใหญ่ / Ascended — แต่ละวัยต่างกันที่จำนวนรอยฟัน · ขนาด · แรงสั่น · ควันเงา =====
@@ -3858,6 +3900,7 @@ async function btPlay(ev){const v=bt.v,fl=(w,t,c)=>v.fl.push({x:w==='e'?186:58,y
     if(e.k==='msg'){btLog(e.t);await sl(grp&&grp.shown?160:520)}
     else if(e.k==='act'&&e.a==='skill'&&e.el==='earth'&&e.si===0&&etUse(e.who)){etCast(e);await sl(ET.hitAt)}   // ขว้างก้อนหินมังกรดินทุกวัย: หินพุ่งไปหาเป้าหมาย แล้วค่อยเด้งดาเมจ
     else if(e.k==='act'&&e.a==='skill'&&e.el==='water'&&e.si===0&&wjUse(e.who)){wjCast(e);await sl(WJ.hitAt)}   // สายน้ำมังกรน้ำวัยรุ่น: สายน้ำพุ่งไปหาเป้าหมาย แล้วค่อยเด้งดาเมจ
+    else if(e.k==='act'&&e.a==='skill'&&e.el==='fire'&&e.si===1&&ffUse(e.who)){const key=e.who==='p'?'pdx':'edx',d=e.who==='p'?1:-1;await tw(v,key,d*18,110);ffCast(e);ffSfx(e);await sl(FF.hit);await tw(v,key,0,110)}   // หมัดเพลิง มังกรไฟ Adult/Ascended: ก้าวเข้าหา → หมัดไฟพุ่งไปกระแทก ระเบิด+จอสั่น แล้วค่อยเด้งดาเมจ → ไฟลุกไหม้ที่ศัตรู
     else if(e.k==='act'&&e.a==='skill'&&e.el==='fire'&&e.si===0&&fbUse(e.who)){fbCast(e);fireSfx(e,'fb');await sl(FB.hitAt)}   // ลูกไฟมังกรวัยรุ่น: พุ่งไปหาเป้าหมาย แล้วค่อยเด้งดาเมจ
     else if(e.k==='act'&&e.a==='skill'&&e.el==='fire'&&e.si===0){fireSfx(e,'st');v.fx.push({who:e.who,t0:performance.now(),st:(e.who==='p'?PF():bt.e).stage,spr:flameOK&&(e.who==='p'?PF().sp:bt.e.sp)==='dragon'&&(e.who==='p'?PF():bt.e).stage===2,sprY:flameYOK&&youngOK&&(e.who==='p'?PF().sp:bt.e.sp)==='dragon'&&(e.who==='p'?PF():bt.e).stage===1,sprA:flameAOK&&ascOK&&(e.who==='p'?PF().sp:bt.e.sp)==='dragon'&&(e.who==='p'?PF():bt.e).stage===3});await sl(1000)}
     else if(e.k==='act'&&e.a==='skill'&&e.el==='water'&&e.si===1&&rainOK){(v.rn=v.rn||[]).push({who:e.who,t0:performance.now()});await sl(RAIN.hit)}   // ฝนกระหน่ำ: ฝนตกจากด้านบนลงใส่เป้าหมาย แล้วค่อยเด้งดาเมจ
