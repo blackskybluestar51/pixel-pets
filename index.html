@@ -2909,7 +2909,7 @@ function btLoop(t){if(!btOn||!bt)return;requestAnimationFrame(btLoop);
   drawDpBack(c,v,now);drawBlessLayer(c,v,now,0);drawBrLayer(c,v,now,0);drawIcwLayer(c,v,now,0);drawCwvLayer(c,v,now,0);
   if(btFwd(v)&&!(now<v.eb&&((now/50)|0)%2)){c.globalAlpha=v.ea;c.save();if(bt.e.boss){c.translate(BAX,BAY);c.scale(BK,BK);c.translate(-BAX,-BAY)};(drawAdFlame(c,v,'e',now,150+v.edx,8,true)||drawFbChar(c,v,'e',now,150+v.edx,8,true)||drawWjChar(c,v,'e',now,150+v.edx,8,true)||drawEtChar(c,v,'e',now,150+v.edx,8,true)||drawYgFlame(c,v,'e',now,150+v.edx,8,true)||drawAsFlame(c,v,'e',now,150+v.edx,8,true)||drawAsVolc(c,v,'e',now,150+v.edx,8,true)||drawLsChar(c,v,'e',now,150+v.edx,8,true)||drawDpChar(c,v,'e',now,150+v.edx,8,true)||bt.ae.draw(c,es,150+v.edx+flameLean(v,'e',now),8,6,true));c.restore();c.globalAlpha=1}
   if(!(now<v.pb&&((now/50)|0)%2)){c.globalAlpha=v.pa;(v.sw?bt.pa.draw(c,ps,18+v.pdx,44,6,!!v.pflip):drawAdFlame(c,v,'p',now,18+v.pdx,44,false)||drawFbChar(c,v,'p',now,18+v.pdx,44,false)||drawWjChar(c,v,'p',now,18+v.pdx,44,false)||drawEtChar(c,v,'p',now,18+v.pdx,44,false)||drawYgFlame(c,v,'p',now,18+v.pdx,44,false)||drawAsFlame(c,v,'p',now,18+v.pdx,44,false)||drawAsVolc(c,v,'p',now,18+v.pdx,44,false)||drawLsChar(c,v,'p',now,18+v.pdx,44,false)||drawDpChar(c,v,'p',now,18+v.pdx,44,false)||bt.pa.draw(c,ps,18+v.pdx+flameLean(v,'p',now),44,6,false));c.globalAlpha=1}
-  btMarks(c,v,now);drawFlame(c,v,now);drawFbVfx(c,v,now);drawWjVfx(c,v,now);drawEtVfx(c,v,now);drawVolcVfx(c,v,now);drawTsuVfx(c,v,now);drawQkVfx(c,v,now);drawEsVfx(c,v,now);drawDlkVfx(c,v,now);drawVtxVfx(c,v,now);drawIcwLayer(c,v,now,1);drawCwvLayer(c,v,now,1);drawRainVfx(c,v,now);drawLsVfx(c,v,now);drawBlessLayer(c,v,now,1);drawBrLayer(c,v,now,1);drawDpFront(c,v,now);
+  btMarks(c,v,now);drawFlame(c,v,now);drawFbVfx(c,v,now);drawWjVfx(c,v,now);drawEtVfx(c,v,now);drawVolcVfx(c,v,now);drawTsuVfx(c,v,now);drawQkVfx(c,v,now);drawEsVfx(c,v,now);drawDlkVfx(c,v,now);drawVtxVfx(c,v,now);drawIagVfx(c,v,now);drawIcwLayer(c,v,now,1);drawCwvLayer(c,v,now,1);drawRainVfx(c,v,now);drawLsVfx(c,v,now);drawBlessLayer(c,v,now,1);drawBrLayer(c,v,now,1);drawDpFront(c,v,now);
   c.font='bold 15px sans-serif';c.textAlign='center';v.fl=v.fl.filter(f=>now-f.t0<1000);
   v.fl.forEach(f=>{const a=(now-f.t0)/1000;c.globalAlpha=1-a*a;c.lineWidth=3;c.strokeStyle='#fff';c.strokeText(f.t,f.x,f.y-a*22);c.fillStyle=f.c;c.fillText(f.t,f.x,f.y-a*22)});c.globalAlpha=1;if(v.flash>0){c.fillStyle='rgba(255,255,255,'+Math.min(1,v.flash)+')';c.fillRect(-8,-8,272,160);v.flash=Math.max(0,v.flash-dt*2.2)}c.restore()}
 /* ฟอร์เมชันศัตรู 3 ตัว: เรียงสมมาตรซ้าย-ขวารอบแกน x=186 (ตัวกลางถอยหลังเล็กน้อย) · ตัวที่ลงมือ/ถูกโจมตีจะ "ก้าวมาช่องหน้า" ขนาดเต็ม เอฟเฟกต์ทั้งหมดเล่นที่ช่องหน้า */
@@ -3359,6 +3359,38 @@ function drawCwvLayer(c,v,now,layer){
     else c.drawImage(cwvImg,i*CWV.W,CWV.ay,CWV.W,CWV.H-CWV.ay,-CWV.ax,0,CWV.W,CWV.H-CWV.ay);
     c.restore();
     if(layer===1&&CWV.tint>0){const g=Math.sin(Math.PI*Math.min(1,t/CWV.total))*CWV.tint*al;c.save();c.globalAlpha=g;c.fillStyle='#9fd8ff';c.fillRect(-8,-8,272,160);c.restore()}}}   // แสงเย็นวาบจางๆ ทั้งจอ
+/* ===== 🧊 สกิลยุคน้ำแข็ง (น้ำแข็ง · สกิล 3 · แช่แข็งศัตรูทั้งหมด) ของมังกรน้ำแข็ง Ascended: พายุหิมะหมุนก่อตัวที่ตำแหน่งศัตรู → ผลึกน้ำแข็งพุ่งขึ้นจากพื้นคลุมทั้งแถว → ค้างแช่แข็งสักครู่ → จางหาย =====
+   VFX: ไฟล์ภายนอก assets/img/ice_age.png (ไม่ฝัง base64) · ชีต 2170×88 · ช่อง 310×88 · 7 เฟรม: 0–3 พายุหิมะหมุนก่อตัวและมีผลึกโผล่ · 4–6 ผลึกน้ำแข็งพุ่งขึ้นเต็มที่ (ค้างเฟรมสุดท้ายตามช่วง hold) · ตัดพื้นเขียวแล้ว · เส้นพื้นอยู่ที่แถว 84 กลางช่อง
+   ถ้าสกิลโดนศัตรูหลายตัว (aoe) จะวางผลึกที่ตำแหน่งศัตรูแต่ละตัวในขนาดย่อ · ปรับจังหวะ/ขนาด/ตำแหน่งได้ที่ค่าคงที่ IAG */
+const iagImg=new Image();let iagOK=false;iagImg.onload=()=>{iagOK=true};iagImg.src='assets/img/ice_age.png';
+const IAG={W:310,H:88,ax:155,ay:84,ms:[90,90,90,100,85,85],hold:620,fade:340,hit:600,k:.5,kM:.45,ky:1.3,alpha:.94,tint:.12,xE:198,gyE:102,xP:66,gyP:136};   // ms=เวลาเฟรม 0–5 · hold=ค้างเฟรมสุดท้าย (ผลึกแช่แข็ง) · fade=เวลาจาง · hit=เวลาที่ดาเมจ/แช่แข็งเด้ง · k/kM=ขนาดตอนศัตรูตัวเดียว/หลายตัว · ky=ยืดแนวตั้ง · tint=แสงเย็นเต็มจอ · (xE,gyE)/(xP,gyP)=ตำแหน่งพื้นใต้ศัตรู/ผู้เล่น
+IAG.tb=IAG.ms.reduce((a,b)=>a+b,0);IAG.te=IAG.tb+IAG.hold;IAG.total=IAG.te+IAG.fade;
+const iagUse=who=>iagOK&&(who==='p'?PF().sp:bt.e.sp)==='dragon'&&(who==='p'?PF().el:bt.e.el)==='ice'&&(who==='p'?PF():bt.e).stage>=3;
+function iagCast(e){const v=bt.v,who=e.who,tg=[];   // ผู้เล่นร่าย → เกิดที่ศัตรู (ทุกตัวถ้าเป็นหมู่) · ศัตรูร่าย → เกิดที่ผู้เล่น
+  if(who==='p'){if(e.aoe&&v.es.length>1)v.es.filter(q=>q.va>.01).forEach(q=>{const S=FORM[q.slot]||FORM[1];tg.push([S.cx,S.fy+2,IAG.kM])});
+    else{const M=bossM('e',[IAG.xE,IAG.gyE]);tg.push([M[0],M[1],(bt.e&&bt.e.boss?BK:1)*IAG.k])}}
+  else tg.push([IAG.xP,IAG.gyP,IAG.k]);
+  (v.iag=v.iag||[]).push({who,t0:performance.now(),tg,fl:0})}
+function iagFrame(t){   // → [เฟรม, ความทึบ, ขนาดพิเศษ]
+  const B=IAG.ms;if(t<IAG.tb){let a=0,i=0;while(i<B.length-1&&t>=a+B[i]){a+=B[i];i++}return[i,Math.min(1,t/60),.92+.08*Math.min(1,t/IAG.tb)]}
+  if(t<IAG.te)return[6,1,1+.012*Math.sin((t-IAG.tb)/110)];
+  const w=(t-IAG.te)/IAG.fade;return[6,Math.max(0,1-w),1.02+.04*w]}
+function drawIagVfx(c,v,now){
+  if(!iagOK||!v.iag)return;v.iag=v.iag.filter(f=>now-f.t0<IAG.total+60);
+  for(const f of v.iag){const t=now-f.t0;if(t<0||t>=IAG.total)continue;
+    if(!f.fl&&t>=IAG.ms[0]+IAG.ms[1]+IAG.ms[2]+IAG.ms[3]){f.fl=1;v.flash=Math.max(v.flash||0,.16)}   // วาบขาวตอนผลึกพุ่งขึ้น
+    const[fr,al,sc]=iagFrame(t);
+    for(const T of f.tg){c.save();c.imageSmoothingEnabled=true;c.globalAlpha=al*IAG.alpha;c.translate(T[0],T[1]);c.scale(T[2]*sc,T[2]*sc*IAG.ky);
+      c.drawImage(iagImg,fr*IAG.W,0,IAG.W,IAG.H,-IAG.ax,-IAG.ay,IAG.W,IAG.H);c.restore()}
+    if(IAG.tint>0){const g=Math.sin(Math.PI*Math.min(1,t/IAG.total))*IAG.tint*al;c.save();c.globalAlpha=g;c.fillStyle='#9fd8ff';c.fillRect(-8,-8,272,160);c.restore()}}}   // แสงเย็นวาบจางๆ ทั้งจอ
+function iagSfx(e){try{if(e&&e.who!=='p'&&typeof FSFX_ENEMY!=='undefined'&&!FSFX_ENEMY)return;if(typeof sndOn==='function'&&!sndOn())return;   // เสียงยุคน้ำแข็ง: ลมหิมะหวีดไต่ระดับ → ผลึกแตกพุ่ง (นอยส์ความถี่สูง) + กริ๊งน้ำแข็ง + ครืนต่ำ (สังเคราะห์ด้วย WebAudio)
+  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;if(!qkAc)qkAc=new AC();const ac=qkAc;if(ac.state==='suspended')ac.resume();
+  const T=ac.currentTime,V=.3,dur=IAG.total/1000,tb=IAG.tb/1000,nb=d=>{const b=ac.createBuffer(1,Math.max(1,Math.floor(ac.sampleRate*d)),ac.sampleRate),x=b.getChannelData(0);for(let k=0;k<x.length;k++)x[k]=Math.random()*2-1;return b};
+  const w=ac.createBufferSource();w.buffer=nb(dur+.1);const bp=ac.createBiquadFilter();bp.type='bandpass';bp.Q.value=1;bp.frequency.setValueAtTime(500,T);bp.frequency.exponentialRampToValueAtTime(3000,T+tb);bp.frequency.exponentialRampToValueAtTime(900,T+dur);
+  const g=ac.createGain();g.gain.setValueAtTime(0,T);g.gain.linearRampToValueAtTime(.85*V,T+tb*.8);g.gain.setValueAtTime(.7*V,T+IAG.te/1000);g.gain.exponentialRampToValueAtTime(.001,T+dur);w.connect(bp);bp.connect(g);g.connect(ac.destination);w.start(T);
+  for(let n=0;n<7;n++){const t=tb*.6+n*.045,s=ac.createBufferSource();s.buffer=nb(.12);const hp=ac.createBiquadFilter();hp.type='highpass';hp.frequency.value=2200+n*350;const gg=ac.createGain();gg.gain.setValueAtTime(.55*V,T+t);gg.gain.exponentialRampToValueAtTime(.001,T+t+.12);s.connect(hp);hp.connect(gg);gg.connect(ac.destination);s.start(T+t)}   // ผลึกแตกพุ่ง
+  const o=ac.createOscillator(),og=ac.createGain();o.type='sine';o.frequency.setValueAtTime(90,T+tb*.6);o.frequency.exponentialRampToValueAtTime(40,T+tb*.6+.5);og.gain.setValueAtTime(0,T+tb*.6);og.gain.linearRampToValueAtTime(.7*V,T+tb*.6+.03);og.gain.exponentialRampToValueAtTime(.001,T+tb*.6+.55);o.connect(og);og.connect(ac.destination);o.start(T+tb*.6);o.stop(T+tb*.6+.6);   // ครืนต่ำ
+  [2093,2637,3136,3951,3520,4186].forEach((f,n)=>{const t=tb*.7+n*.08,o2=ac.createOscillator(),g2=ac.createGain();o2.type='sine';o2.frequency.value=f;g2.gain.setValueAtTime(0,T+t);g2.gain.linearRampToValueAtTime(.3*V,T+t+.01);g2.gain.exponentialRampToValueAtTime(.001,T+t+.5);o2.connect(g2);g2.connect(ac.destination);o2.start(T+t);o2.stop(T+t+.55)})}catch(err){}}   // กริ๊งๆ น้ำแข็ง
 /* ===== 🌧️ สกิลฝนกระหน่ำ (น้ำ · สกิล 2): ม่านฝนตกลงมาจากด้านบนจอ → กระทบพื้นที่ตัวเป้าหมาย → ละอองน้ำแตกกระจาย 6 เฟรม =====
    ชีต 1560×92 · ช่อง 260×92 (ตัดพื้นเขียวแล้ว · เส้นพื้นของทุกเฟรมเรียงตรงกันที่แถว 80) · ปรับจังหวะ/ขนาดที่ RAIN
    w = ความกว้างบนฉาก (ศัตรูช่องหน้ากว้าง 96 · บอส ×BK) · fall = ความเร็วฝนตก (px/ms) · hit = เวลาที่ตัวเลขดาเมจเด้ง */
@@ -3645,6 +3677,7 @@ async function btPlay(ev){const v=bt.v,fl=(w,t,c)=>v.fl.push({x:w==='e'?186:58,y
     else if(e.k==='act'&&e.a==='skill'&&e.el==='water'&&e.si===1&&rainOK){(v.rn=v.rn||[]).push({who:e.who,t0:performance.now()});await sl(RAIN.hit)}   // ฝนกระหน่ำ: ฝนตกจากด้านบนลงใส่เป้าหมาย แล้วค่อยเด้งดาเมจ
     else if(e.k==='act'&&e.a==='skill'&&e.el==='ice'&&e.si===0&&cwvUse(e.who)){cwvCast(e);icwSfx(e);await sl(CWV.hit)}   // ลมเย็น (สกิล 1) มังกรน้ำแข็ง Young/Adult/Ascended: ลมเย็นหมุนที่ตำแหน่งศัตรู แล้วค่อยเด้งดาเมจ+ลดความเร็ว
     else if(e.k==='act'&&e.a==='skill'&&e.el==='ice'&&e.si===1&&icwUse(e.who)){icwCast(e);icwSfx(e);await sl(ICW.hit)}   // ลมหนาวเยือกแข็ง (สกิล 2) มังกรน้ำแข็ง Young/Adult/Ascended: ลมเย็นหมุนพันรอบตัวศัตรู แล้วค่อยเด้งดาเมจ+ลดความเร็ว
+    else if(e.k==='act'&&e.a==='skill'&&e.el==='ice'&&e.si===2&&iagUse(e.who)){iagCast(e);iagSfx(e);await sl(IAG.hit)}   // ยุคน้ำแข็ง มังกรน้ำแข็ง Ascended: ผลึกน้ำแข็งพุ่งขึ้นที่ตำแหน่งศัตรูทั้งหมด แล้วค่อยเด้งดาเมจ+แช่แข็ง
     else if(e.k==='act'&&e.a==='skill'&&e.el==='electric'&&e.si===2&&vtxUse(e.who)){vtxCast(e);vtxSfx(e);await sl(VTX.hit)}   // พายุสายฟ้า มังกรไฟฟ้า Ascended: พายุไฟฟ้าก่อตัวที่ตำแหน่งศัตรู หมุนวนแล้วสลาย ดาเมจ+ลดความเร็วเด้งตอนพายุเต็มกำลัง
     else if(e.k==='act'&&e.a==='skill'&&e.el==='electric'&&e.si===1&&dlkUse(e.who)){(v.dlk=v.dlk||[]).push({who:e.who,t0:performance.now(),fl:[]});dlkSfx(e);await sl(DLK.hit)}   // ฟ้าผ่าต่อเนื่อง 2 ครั้ง มังกรไฟฟ้า Adult/Ascended: ฟ้าผ่าลงตำแหน่งศัตรู 2 ครั้ง ตรงกับดาเมจ 2 ฮิต
     else if(e.k==='act'&&e.a==='skill'&&e.el==='electric'&&e.si===0&&esUse(e.who)){(v.es_=v.es_||[]).push({who:e.who,t0:performance.now()});esSfx(e);await sl(ES.hit)}   // ประกายไฟฟ้า มังกรไฟฟ้า Young/Adult/Ascended: สายฟ้าฟาดลงตัวเป้าหมาย แล้วไฟฟ้าระเบิดที่พื้นใต้เท้า แล้วค่อยเด้งดาเมจ
