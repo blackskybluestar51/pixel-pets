@@ -972,6 +972,32 @@ function unicornYoungSheet(){
   for(let f=0;f<4;f++){tc.clearRect(0,0,16,16);drawGrave(tc,'unicorn',f);c.drawImage(t,0,0,16,16,f*N+8,5*N+16,64,64)}
   cv.fr=[4,4,6,8,4,4,4];cv.lp=[null,null,4,null,null,null,null];cv.spd=[1,.9,.9,.5,1,1,1];   // นอน: เล่น 0–3 แล้ววนเฟรม 4–5 (Zz)
   cv.cell=N;cv.pix=.2;return cv}
+/* ---------- ยูนิคอร์นวัยรุ่น ธาตุแสง: ดีไซน์ใหม่ (ยูนิคอร์นขาว ผมและหางเป็นแสงสีทอง เขาและเกราะทองประดับอัญมณี มีประกายลอย · หันขวา · ช่อง 80×80 · ชีต 640×560)
+   แถว: 0 ยืน idle 6 · 1 กิน 6 · 2 นอน 6 (ยืน→ง่วง→ล้มตัวนอน แล้ววนเฟรม 4–5 มี Zz) · 3 เดิน 6 (ผมและหางพริ้ว มีช่วงลอยตัว) · 4 ป่วย 4 (ย้อมโทนเขียวซีดจากท่ายืน) · 5 ตาย (หลุมศพจากโค้ด) · 6 นั่ง 4 (ใช้ท่ายืน)
+   หมายเหตุ: ตัวนี้กว้างเกือบเต็มช่อง 80 (ผมและหางแสงยาว) จึงย่อให้พอดี · ภาพต้นฉบับพื้นหลังเขียว — ตัดสีเขียวออกแล้ว ---------- */
+const uniLYImg=new Image();let uniLYOK=false;
+uniLYImg.onload=()=>{uniLYOK=true;for(const k in sheets)if(k.startsWith('unicorn1'))delete sheets[k];if(typeof drawPreviews==='function')drawPreviews()};
+uniLYImg.src='assets/img/unily.png';
+function unicornLightYoungSheet(){
+  const N=80,cv=document.createElement('canvas');cv.width=8*N;cv.height=7*N;
+  const c=cv.getContext('2d');c.imageSmoothingEnabled=false;c.drawImage(uniLYImg,0,0);
+  const t=document.createElement('canvas');t.width=16;t.height=16;const tc=t.getContext('2d');   // ท่าตาย ใช้หลุมศพเดิม
+  for(let f=0;f<4;f++){tc.clearRect(0,0,16,16);drawGrave(tc,'unicorn',f);c.drawImage(t,0,0,16,16,f*N+8,5*N+16,64,64)}
+  cv.fr=[6,6,6,6,4,4,4];cv.lp=[null,null,4,null,null,null,null];cv.spd=[1,.9,.9,.55,1,1,1];   // นอน: เล่น 0–3 แล้ววนเฟรม 4–5
+  cv.cell=N;cv.pix=.2;return cv}
+/* ---------- ยูนิคอร์นวัยรุ่น ธาตุเงา: ดีไซน์ใหม่ (ยูนิคอร์นขาว ผมและหางเป็นเปลวเงาสีม่วงเข้ม เขาเงิน เกราะเงินประดับอัญมณีม่วง มีเปลวไฟเงาลอย · หันขวา · ช่อง 80×80 · ชีต 640×560)
+   แถว: 0 ยืน idle 6 · 1 กิน 6 · 2 นอน 6 (ยืน→ง่วง→ล้มตัวนอน แล้ววนเฟรม 4–5 มี Zz) · 3 เดิน 6 (ผมและหางพริ้ว มีช่วงลอยตัว) · 4 ป่วย 4 (ย้อมโทนเขียวซีดจากท่ายืน) · 5 ตาย (หลุมศพจากโค้ด) · 6 นั่ง 4 (ใช้ท่ายืน)
+   หมายเหตุ: ตัวนี้กว้างเกือบเต็มช่อง 80 (ผมและหางเปลวยาว) จึงย่อให้พอดี · ภาพต้นฉบับพื้นหลังเขียว — ตัดสีเขียวออกแล้ว ---------- */
+const uniSYImg=new Image();let uniSYOK=false;
+uniSYImg.onload=()=>{uniSYOK=true;for(const k in sheets)if(k.startsWith('unicorn1'))delete sheets[k];if(typeof drawPreviews==='function')drawPreviews()};
+uniSYImg.src='assets/img/unisy.png';
+function unicornShadowYoungSheet(){
+  const N=80,cv=document.createElement('canvas');cv.width=8*N;cv.height=7*N;
+  const c=cv.getContext('2d');c.imageSmoothingEnabled=false;c.drawImage(uniSYImg,0,0);
+  const t=document.createElement('canvas');t.width=16;t.height=16;const tc=t.getContext('2d');   // ท่าตาย ใช้หลุมศพเดิม
+  for(let f=0;f<4;f++){tc.clearRect(0,0,16,16);drawGrave(tc,'unicorn',f);c.drawImage(t,0,0,16,16,f*N+8,5*N+16,64,64)}
+  cv.fr=[6,6,6,6,4,4,4];cv.lp=[null,null,4,null,null,null,null];cv.spd=[1,.9,.9,.55,1,1,1];   // นอน: เล่น 0–3 แล้ววนเฟรม 4–5
+  cv.cell=N;cv.pix=.2;return cv}
 /* ---------- ยูนิคอร์นวัยรุ่น ธาตุน้ำ: ดีไซน์ใหม่ (ยูนิคอร์นขาว ผมและหางเป็นสายน้ำสีฟ้า เกราะเงินประดับอัญมณีน้ำ มีฟองน้ำลอย · หันขวา · ช่อง 80×80 · ชีต 640×560)
    แถว: 0 ยืน idle 6 (กระพริบตา/ยกเท้า) · 1 กิน 6 (ยิ้มหลับตา→ยกเท้ากินไป→อิ่ม) · 2 นอน 6 (ยืน→ง่วง→ล้มตัวนอน แล้ววนเฟรม 4–5) · 3 เดิน 6 (ผมและหางพริ้ว มีช่วงลอยตัว) · 4 ป่วย 4 (ย้อมโทนเขียวซีดจากท่ายืน) · 5 ตาย (หลุมศพจากโค้ด) · 6 นั่ง 4 (ใช้ท่ายืน) ---------- */
 const uniWYImg=new Image();let uniWYOK=false;
@@ -1468,6 +1494,8 @@ function getSheet(sp,st,form,acc){
   if(sp==='slime'&&st===1&&slShadYOK&&acc===EL.shadow.c)return sheets[k]=slimeShadYoungSheet();   // สไลม์วัยรุ่นธาตุเงา: ดีไซน์ใหม่
   if(sp==='slime'&&st===1)return sheets[k]=slimeYoungSheet(acc);   // สไลม์วัยรุ่น: ยืนสองขา (ย้อมสีตามธาตุ)
   if(sp==='unicorn'&&st===0&&uniBOK)return sheets[k]=unicornBabySheet();   // ยูนิคอร์นวัยเด็ก: ดีไซน์ใหม่
+  if(sp==='unicorn'&&st===1&&uniLYOK&&acc===EL.light.c)return sheets[k]=unicornLightYoungSheet();   // ยูนิคอร์นวัยรุ่นธาตุแสง: ดีไซน์ใหม่
+  if(sp==='unicorn'&&st===1&&uniSYOK&&acc===EL.shadow.c)return sheets[k]=unicornShadowYoungSheet();   // ยูนิคอร์นวัยรุ่นธาตุเงา: ดีไซน์ใหม่
   if(sp==='unicorn'&&st===1&&uniEYOK&&acc===EL.earth.c)return sheets[k]=unicornEarthYoungSheet();   // ยูนิคอร์นวัยรุ่นธาตุดิน: ดีไซน์ใหม่
   if(sp==='unicorn'&&st===1&&uniNYOK&&acc===EL.nature.c)return sheets[k]=unicornNatureYoungSheet();   // ยูนิคอร์นวัยรุ่นธาตุธรรมชาติ: ดีไซน์ใหม่
   if(sp==='unicorn'&&st===1&&uniFYOK&&acc===EL.fire.c)return sheets[k]=unicornFireYoungSheet();   // ยูนิคอร์นวัยรุ่นธาตุไฟ: ดีไซน์ใหม่
@@ -2513,7 +2541,7 @@ const CRUMB={chili:'r',soup:'t',broccoli:'g',choco:'k',lime:'l',bingsu:'p',lemon
 function drawFood(ctx,k,px,now){
   const t=Math.max(0,Math.min(1,1-(rt.eatUntil-now)/EAT_MS));
   const art=FOOD_ART[k],S=3,e=Math.min(1,t/.25),ease=1-(1-e)*(1-e);          // 0-25%: อาหารลอยเข้ามาหาปาก
-  const ub=P.sp==='unicorn'&&P.stage===0&&uniBOK,uw=P.sp==='unicorn'&&P.stage===1&&((P.el==='water'&&uniWYOK)||(P.el==='fire'&&uniFYOK)||(P.el==='nature'&&uniNYOK)||(P.el==='earth'&&uniEYOK)),bb=P.sp==='dragon'&&P.stage===0,yg=P.sp==='dragon'&&P.stage===1&&youngOK,eg=P.sp==='dragon'&&P.stage===1&&P.el==='earth'&&earthYOK,wg=P.sp==='dragon'&&P.stage===1&&P.el==='water'&&waterYOK,ng=P.sp==='dragon'&&P.stage===1&&P.el==='nature'&&natYOK,ig=P.sp==='dragon'&&P.stage===1&&P.el==='ice'&&iceYOK,ec=P.sp==='dragon'&&P.stage===1&&P.el==='electric'&&elecYOK,ad=P.sp==='dragon'&&P.stage===2&&adultOK,as=P.sp==='dragon'&&P.stage===3&&ascOK,ea=P.sp==='dragon'&&P.stage===2&&P.el==='earth'&&earthAOK,wa=P.sp==='dragon'&&P.stage===2&&P.el==='water'&&waterAOK,na=P.sp==='dragon'&&P.stage===2&&P.el==='nature'&&natAOK,ia=P.sp==='dragon'&&P.stage===2&&P.el==='ice'&&iceAOK,iz=P.sp==='dragon'&&P.stage===3&&P.el==='ice'&&iceAscOK,sg=isShadY(P),sA=P.sp==='dragon'&&P.stage===2&&P.el==='shadow'&&shadAOK,sQ=P.sp==='dragon'&&P.stage===3&&P.el==='shadow'&&shadAscOK,x=px+(uw?66:sQ?82:sA?60:sg?50:iz?88:ia?75:bb?60:ec?58:wa?89:na?88:ea?77:wg?64:eg?64:ig?32:ng?34:yg?66:ad?70:as?88:62)+(1-ease)*28, y=(ub?56:uw?40:sQ?57:sA?56:sg?62:iz?26:ia?16:ec?48:bb?69:wa?46:na?34:ea?60:wg?38:eg?50:ig?38:ng?38:yg?55:ad?44:as?42:46)-(1-ease)*36+(t>.25?Math.sin(now/90)*1.5:0);   // เบบี้ตัวเล็ก ปากอยู่ต่ำกว่า
+  const ub=P.sp==='unicorn'&&P.stage===0&&uniBOK,uw=P.sp==='unicorn'&&P.stage===1&&((P.el==='water'&&uniWYOK)||(P.el==='fire'&&uniFYOK)||(P.el==='light'&&uniLYOK)||(P.el==='shadow'&&uniSYOK)||(P.el==='nature'&&uniNYOK)||(P.el==='earth'&&uniEYOK)),bb=P.sp==='dragon'&&P.stage===0,yg=P.sp==='dragon'&&P.stage===1&&youngOK,eg=P.sp==='dragon'&&P.stage===1&&P.el==='earth'&&earthYOK,wg=P.sp==='dragon'&&P.stage===1&&P.el==='water'&&waterYOK,ng=P.sp==='dragon'&&P.stage===1&&P.el==='nature'&&natYOK,ig=P.sp==='dragon'&&P.stage===1&&P.el==='ice'&&iceYOK,ec=P.sp==='dragon'&&P.stage===1&&P.el==='electric'&&elecYOK,ad=P.sp==='dragon'&&P.stage===2&&adultOK,as=P.sp==='dragon'&&P.stage===3&&ascOK,ea=P.sp==='dragon'&&P.stage===2&&P.el==='earth'&&earthAOK,wa=P.sp==='dragon'&&P.stage===2&&P.el==='water'&&waterAOK,na=P.sp==='dragon'&&P.stage===2&&P.el==='nature'&&natAOK,ia=P.sp==='dragon'&&P.stage===2&&P.el==='ice'&&iceAOK,iz=P.sp==='dragon'&&P.stage===3&&P.el==='ice'&&iceAscOK,sg=isShadY(P),sA=P.sp==='dragon'&&P.stage===2&&P.el==='shadow'&&shadAOK,sQ=P.sp==='dragon'&&P.stage===3&&P.el==='shadow'&&shadAscOK,x=px+(uw?66:sQ?82:sA?60:sg?50:iz?88:ia?75:bb?60:ec?58:wa?89:na?88:ea?77:wg?64:eg?64:ig?32:ng?34:yg?66:ad?70:as?88:62)+(1-ease)*28, y=(ub?56:uw?40:sQ?57:sA?56:sg?62:iz?26:ia?16:ec?48:bb?69:wa?46:na?34:ea?60:wg?38:eg?50:ig?38:ng?38:yg?55:ad?44:as?42:46)-(1-ease)*36+(t>.25?Math.sin(now/90)*1.5:0);   // เบบี้ตัวเล็ก ปากอยู่ต่ำกว่า
   const col0=(t<.3?0:Math.min(3,Math.floor((t-.3)/.7*4)))*2;                 // 30-100%: กัดทีละคำ หายไปทีละส่วน
   art.forEach((row,r)=>{for(let c=col0;c<8;c++){const ch=row[c];if(ch!=='.'){ctx.fillStyle=FPAL[ch];ctx.fillRect(Math.round(x+c*S),Math.round(y+r*S),S,S)}}});
   if(t>.3&&t<1){ctx.fillStyle=FPAL[CRUMB[k]||'c'];for(let i=0;i<3;i++)ctx.fillRect(Math.round(px+(sQ?94:sA?70:sg?62:iz?100:ia?88:ec?62:wa?100:na?96:ea?86:wg?68:eg?70:ig?40:ng?40:yg?62:ad?72:as?90:bb?56:52)+i*4),Math.round((sQ?73:sA?62:sg?64:iz?44:ia?34:ec?62:wa?60:na?52:ea?72:wg?62:eg?66:ig?56:ng?56:yg?72:ad?57:as?56:bb?76:66)+((now/25+i*9)%14)),2,2)}   // เศษอาหารร่วง
