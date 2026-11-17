@@ -2427,7 +2427,7 @@ function renderPanel(){
   el.classList.remove('hide');let h='';
   const row=(n,sub,btn,fn,dis)=>`<div class="item"><span>${n}<br><span class="mut">${sub}</span></span><button ${dis?'disabled':''} onclick="${fn}">${btn}</button></div>`;
   if(m==='feed'){h='<b>เลือกอาหาร</b>';for(const k in FOODS){const n=P.inv[k]||0;h+=row(FOODS[k].n,'มี '+n+' · '+foodFx(FOODS[k]),'ให้กิน',`feed('${k}')`,!n)}}
-  if(m==='play'){h='<b>เล่นกับ '+P.name+'</b>'+row('🤲 เล่นมือเปล่า','สุข +12 · พลังงาน −10','เล่น',`play()`)+row('🚀 Space Shooter','มินิเกม 40 วินาที · ชนะได้ 🪙 2 · สุข +18 · พลังงาน −10','เล่น',`openSpaceShooter()`);h+=row('วิ่งกระโดด','มินิเกมวิ่งข้ามสิ่งกีดขวาง · 🪙 +2~5 · สุข +6~20 · พลังงาน −10','เล่น',`openDino()`);for(const k in TOYS){const n=P.inv[k]||0;h+=row(TOYS[k].n,'มี '+n+' · สุข +'+TOYS[k].hap,'เล่น',`play('${k}')`,!n)}}
+  if(m==='play'){h='<b>เล่นกับ '+P.name+'</b>'+row('🤲 เล่นมือเปล่า','สุข +12 · พลังงาน −10','เล่น',`play()`)+row('🚀 Space Shooter','มินิเกม 40 วินาที · ชนะได้ 🪙 2 · สุข +18 · พลังงาน −10','เล่น',`openSpaceShooter()`);h+=row('วิ่งกระโดด','มินิเกม 60 วิ ยิ่งเล่นยิ่งเร็ว · แข่งคะแนนกับเพื่อน · 🪙 +2~5 · สุข +6~20 · พลังงาน −10','เล่น',`openDino()`);for(const k in TOYS){const n=P.inv[k]||0;h+=row(TOYS[k].n,'มี '+n+' · สุข +'+TOYS[k].hap,'เล่น',`play('${k}')`,!n)}}
   if(m==='shop'){
     const pt=rt.shopTab==='partner',sel=rt.shopSelected;
     h=`<b>🛒 ร้านค้า</b><div class="row" style="margin:6px 0 2px"><button class="${pt?'':'on'}" onclick="setShopTab('normal')">🪙 ร้านค้าปกติ</button><button class="${pt?'on':''}" onclick="setShopTab('partner')">🤝 ร้านค้าพันธมิตร</button></div>`;
@@ -4146,7 +4146,7 @@ function socCatchUp(acts){   // จำลองเวลาเดียวกั
 async function socFetchInbox(){if(!socOn())return[];const r=await socCall('social_inbox');return Array.isArray(r)?r:[]}
 async function socAck(acts){const ids=(acts||[]).map(a=>a.id);if(ids.length&&socOn())await socCall('social_ack',{p_ids:ids})}
 async function socPublish(){if(!socOn()||!soc.ready||!P)return;
-  await socCall('social_publish',{p_snapshot:{name:P.name,sp:P.sp,gender:P.gender,stage:P.stage,el:P.el||null,lv:P.lv,food:Math.round(P.food),hap:Math.round(P.hap),clean:Math.round(P.clean),en:Math.round(P.en),hp:Math.round(P.hp),bond:Math.round(P.bond||0),sick:!!P.sick,sleeping:!!P.sleeping,dead:!!P.dead,trait:P.trait||null,role:P.role||null,sub:P.sub==null?null:P.sub,genes:P.genes||null,skup:skPub()}})}
+  await socCall('social_publish',{p_snapshot:{name:P.name,dino:P.dinoBest|0,sp:P.sp,gender:P.gender,stage:P.stage,el:P.el||null,lv:P.lv,food:Math.round(P.food),hap:Math.round(P.hap),clean:Math.round(P.clean),en:Math.round(P.en),hp:Math.round(P.hp),bond:Math.round(P.bond||0),sick:!!P.sick,sleeping:!!P.sleeping,dead:!!P.dead,trait:P.trait||null,role:P.role||null,sub:P.sub==null?null:P.sub,genes:P.genes||null,skup:skPub()}})}
 async function socRefresh(){if(!socOn()||!soc.ready)return;const r=await socCall('social_overview');if(!r||!r.me)return;
   soc.me=r.me;soc.incoming=r.incoming||[];soc.outgoing=r.outgoing||[];
   soc.friends=(r.friends||[]).map(f=>{const prev=soc.friends.find(o=>o.id===f.id),snapAt=Date.now()-(f.age_s||0)*1000;
@@ -5328,16 +5328,17 @@ const _db=devBar;devBar=function(on){_db(on);if(on)devUI()};devUI();
 const W=360,H=160,GY=132,PX=60;                 // ขนาดฉาก · เส้นพื้น · ตำแหน่ง x ของสัตว์เลี้ยง
 const CFG={ENERGY:10,HAP_MIN:6,HAP_MAX:20,HAP_PER:40,COIN_MIN:2,COIN_MAX:5,COIN_PER:200,   // เหรียญทอง 2–5 ต่อรอบ: 2 + ทุก 200 คะแนน +1 (600 คะแนนขึ้นไป = 5)
      // จบเกม: พลังงาน −10 · สุข +6 ถึง +20 (ทุก 40 คะแนน +1)
-  G:1800,JUMP:500,V0:190,VMAX:400,SC:5,
+  G:1800,JUMP:500,V0:170,VEND:470,DUR:60,WIN_BONUS:60,SC:5,
   TH:61,HW:20,HH:34};   // TH = ความสูงตัวละครที่เห็น (px) = ขนาดมังกรวัยรุ่น เท่ากันทุกตัวทุกวัย · HW/HH = กล่องชน
 const $q=s=>document.querySelector(s);
-const css=document.createElement('style');css.textContent='#dnModal .mbox{max-width:640px!important}#dnModal .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}#dnWrap{position:relative;border-radius:14px;overflow:hidden;border:2px solid var(--line)}#dnCv{display:block;width:100%;aspect-ratio:'+W+'/'+H+';image-rendering:pixelated;touch-action:none;background:#dff3ff}#dnOv{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgba(20,10,40,.55);color:#fff;text-align:center;padding:10px}#dnOv.hide{display:none}#dnOv .row{display:flex;gap:8px;justify-content:center}#dnHud{display:flex;justify-content:space-between;font-weight:700;margin:4px 2px 6px}#dnCtl{display:flex;gap:8px;margin-top:8px}#dnCtl button{flex:1;min-height:52px;font-size:16px;touch-action:none}';
+const css=document.createElement('style');css.textContent='#dnModal .mbox{max-width:640px!important}#dnModal .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}#dnWrap{position:relative;border-radius:14px;overflow:hidden;border:2px solid var(--line)}#dnCv{display:block;width:100%;aspect-ratio:'+W+'/'+H+';image-rendering:pixelated;touch-action:none;background:#dff3ff}#dnOv{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgba(20,10,40,.55);color:#fff;text-align:center;padding:10px}#dnOv.hide{display:none}#dnOv .row{display:flex;gap:8px;justify-content:center}#dnHud{display:flex;justify-content:space-between;font-weight:700;margin:4px 2px 6px}#dnCtl{display:flex;gap:8px;margin-top:8px}#dnCtl button{flex:1;min-height:52px;font-size:16px;touch-action:none}#dnTm{height:6px;background:var(--line);border-radius:4px;overflow:hidden;margin:0 2px 6px}#dnTm i{display:block;height:100%;width:0;background:var(--grad)}#dnRv{font-size:12.5px;min-height:18px;margin:0 2px 6px;color:var(--mut)}#dnLb{margin-top:10px;text-align:left}#dnLb h4{margin:0 0 6px;font-size:14px}.lbr{display:grid;grid-template-columns:28px 1fr auto;gap:2px 6px;align-items:center;font-size:13px;margin:5px 0}.lbr .bw{grid-column:2/4;height:6px;background:var(--line);border-radius:4px;overflow:hidden}.lbr .bw i{display:block;height:100%;background:var(--acc)}.lbr.me{font-weight:700;color:var(--acc)}';
 document.head.appendChild(css);
 const m=document.createElement('div');m.id='dnModal';m.className='modal hide';
 m.innerHTML='<div class="mbox"><div class="top"><b>วิ่งกระโดด</b><button id="dnClose" aria-label="ปิด" style="flex:0 0 auto;min-height:0;padding:4px 12px">✕</button></div>'
- +'<div id="dnHud"><span id="dnSc">คะแนน 0</span><span id="dnBest">สูงสุด 0</span></div>'
+ +'<div id="dnHud"><span id="dnSc">คะแนน 0</span><span id="dnTimeT">⏱ 60 วิ</span><span id="dnBest">สูงสุด 0</span></div><div id="dnTm"><i></i></div><div id="dnRv"></div>'
  +'<div id="dnWrap"><canvas id="dnCv" width="'+W+'" height="'+H+'"></canvas><div id="dnOv" class="hide"></div></div>'
  +'<div id="dnCtl"><button id="dnJump" class="on">⬆ กระโดด</button><button id="dnDuck">⬇ ก้ม</button></div>'
+ +'<div id="dnLb"></div>'
  +'<div class="mut" style="margin-top:6px;font-size:12px">แตะ/Space/↑ = กระโดด · กดค้างครึ่งล่างของจอ/↓ = ก้ม (หลบนก) · จบเกม สุข +'+CFG.HAP_MIN+'–'+CFG.HAP_MAX+' · 🪙 +'+CFG.COIN_MIN+'–'+CFG.COIN_MAX+' · พลังงาน −'+CFG.ENERGY+'</div></div>';
 document.body.appendChild(m);
 const cv=$q('#dnCv'),c=cv.getContext('2d'),ov=$q('#dnOv');c.imageSmoothingEnabled=false;
@@ -5346,32 +5347,45 @@ let G=null,raf=0,lastT=0,isOpen=false,ap=null,jumpReq=false,duckHeld=false;
 const needMsg=()=>!P?'ยังไม่พร้อม':P.dead?'จากไปแล้ว…':P.bathing?'🛁 กำลังอาบน้ำอยู่…':P.sleeping?'😴 กำลังหลับอยู่…':(window.advBusy&&window.advBusy())?'🏃 หนีออกจากบ้านอยู่ รอให้กลับมาก่อนนะ':P.en<15?'⚡ เหนื่อยเกินไป พักก่อนนะ':'';
 function showOv(h){ov.innerHTML=h;ov.classList.remove('hide')}
 const best=()=>(P&&P.dinoBest)||0;
-function paintHud(){$q('#dnSc').textContent='คะแนน '+Math.floor(G?G.score:0);$q('#dnBest').textContent='สูงสุด '+best()}
+const frs=()=>{try{return(typeof soc!=='undefined'&&soc.friends)?soc.friends:[]}catch(e){return[]}};
+const fScore=f=>((f.pet&&f.pet.dino)|0);
+function lbList(cur){const a=[{name:'คุณ',score:Math.max(best(),cur|0),me:true}];frs().forEach(f=>a.push({name:f.name||'เพื่อน',score:fScore(f)}));return a.sort((x,y)=>y.score-x.score)}
+function nextRival(s){let r=null;frs().forEach(f=>{const v=fScore(f);if(v>s&&(!r||v<r.score))r={name:f.name||'เพื่อน',score:v}});return r}
+function rankTxt(){const a=lbList(0);return a.length<2?'':' · อันดับ #'+(a.findIndex(x=>x.me)+1)+' จาก '+a.length}
+function paintLb(){const el=$q('#dnLb');if(!el)return;const a=lbList(G&&G.state==='dead'?Math.floor(G.score):0),mx=Math.max(1,a[0].score),md=['🥇','🥈','🥉'];
+  el.innerHTML='<h4>🏆 อันดับคะแนนกับเพื่อน</h4>'+a.slice(0,8).map((x,i)=>'<div class="lbr'+(x.me?' me':'')+'"><span>'+(md[i]||(i+1))+'</span><span>'+esc(x.name)+'</span><span>'+(x.score||'ยังไม่เล่น')+'</span><div class="bw"><i style="width:'+Math.round(x.score/mx*100)+'%"></i></div></div>').join('')
+  +(frs().length?'':'<div class="mut" style="font-size:12px">เพิ่มเพื่อนที่เมนู 👥 เพื่อน (ต้องล็อกอิน) เพื่อเห็นคะแนนของเพื่อนที่นี่</div>')}
+function paintHud(){const s=Math.floor(G?G.score:0),rt=G?Math.min(CFG.DUR,G.rt):0;
+  $q('#dnSc').textContent='คะแนน '+s;$q('#dnBest').textContent='สูงสุด '+best();
+  $q('#dnTimeT').textContent='⏱ '+Math.max(0,Math.ceil(CFG.DUR-rt))+' วิ · ⚡x'+(G?(G.speed/CFG.V0).toFixed(1):'1.0');
+  $q('#dnTm i').style.width=(rt/CFG.DUR*100)+'%';
+  let rv='';if(G&&G.state==='run'){const r=nextRival(s);rv=r?'🎯 อีก '+(r.score-s)+' คะแนนจะแซง '+r.name:(frs().length?'👑 คุณนำเพื่อนทุกคนอยู่!':'')}
+  $q('#dnRv').textContent=rv}
 
-function newGame(){G={state:'ready',score:0,dist:0,y:0,vy:0,duck:false,speed:CFG.V0,next:260,obs:[],clouds:[{x:60,y:30},{x:200,y:18},{x:320,y:40}],t:0,flash:0};jumpReq=false}
-function readyOv(){showOv('<b style="font-size:20px">วิ่งกระโดด</b><div style="font-size:13px">พา <b>'+esc(P.name||'สัตว์เลี้ยง')+'</b> วิ่งข้ามกระบองเพชร · ก้มหลบนก!</div><div class="row"><button id="dnGo" class="on">▶ เริ่มเล่น</button></div>');$q('#dnGo').onclick=start}
+function newGame(){G={state:'ready',score:0,dist:0,y:0,vy:0,duck:false,speed:CFG.V0,next:260,obs:[],clouds:[{x:60,y:30},{x:200,y:18},{x:320,y:40}],t:0,rt:0,lvl:1,lvt:0,flash:0};jumpReq=false}
+function readyOv(){showOv('<b style="font-size:20px">วิ่งกระโดด</b><div style="font-size:13px">พา <b>'+esc(P.name||'สัตว์เลี้ยง')+'</b> วิ่งให้รอดครบ 60 วินาที · ยิ่งนานยิ่งเร็ว ⚡ · ก้มหลบนก!</div><div class="row"><button id="dnGo" class="on">▶ เริ่มเล่น</button></div>');$q('#dnGo').onclick=start}
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
-function start(){if(!G||G.state==='run')return;newGame();G.state='run';ov.classList.add('hide')}
+function start(){if(!G||G.state==='run')return;newGame();G.state='run';ov.classList.add('hide');paintLb()}
 
 /* ---------- สร้างสิ่งกีดขวาง ---------- */
 function spawn(){
-  const bird=G.score>150&&Math.random()<.3;
+  const bird=G.rt>8&&Math.random()<.3;
   if(bird){G.obs.push({k:'bird',x:W+20,w:26,h:14,b:24});return}   // นกบินต่ำ: ก้มหลบ (หรือกระโดดข้าม)
-  const n=1+(Math.random()<.35?1:0)+(G.score>250&&Math.random()<.25?1:0),h=22+Math.floor(Math.random()*14);
+  const n=1+(Math.random()<.35?1:0)+(G.rt>20&&Math.random()<.25?1:0),h=22+Math.floor(Math.random()*14);
   G.obs.push({k:'cactus',x:W+20,w:11*n+(n-1)*2,h,b:0,n})}
 function hit(o){const ph=G.duck&&G.y<2?Math.round(CFG.HH*.53):CFG.HH,px=PX-CFG.HW/2,pw=CFG.HW,py=GY-G.y-ph;
   const ox=o.x+2,ow=o.w-4,oy=GY-o.b-o.h+2,oh=o.h-4;return px<ox+ow&&px+pw>ox&&py<oy+oh&&py+ph>oy}
 
 /* ---------- อัปเดต ---------- */
 function update(dt){const g=G;g.t+=dt;if(g.state!=='run')return;
-  g.speed=Math.min(CFG.VMAX,CFG.V0+g.dist/60);g.dist+=g.speed*dt;g.score=g.dist/12;
+  g.rt+=dt;g.speed=CFG.V0+(CFG.VEND-CFG.V0)*Math.min(1,g.rt/CFG.DUR);g.dist+=g.speed*dt;g.score=g.dist/30;const lv=Math.min(6,1+Math.floor(g.rt/10));if(lv>g.lvl){g.lvl=lv;g.lvt=1.2;g.flash=.25}if(g.lvt>0)g.lvt-=dt;
   g.duck=duckHeld;
   if(jumpReq&&g.y===0){g.vy=CFG.JUMP;jumpReq=false}else if(g.y===0)jumpReq=false;
   if(g.y>0||g.vy>0){g.vy-=CFG.G*dt*(g.duck?1.8:1);g.y=Math.max(0,g.y+g.vy*dt);if(g.y===0)g.vy=0}
   g.next-=g.speed*dt;if(g.next<=0){spawn();g.next=g.speed*.75+70+Math.random()*220}
   g.obs.forEach(o=>o.x-=g.speed*dt);g.obs=g.obs.filter(o=>o.x+o.w>-10);
   g.clouds.forEach(k=>{k.x-=g.speed*dt*.15;if(k.x<-40){k.x=W+20;k.y=10+Math.random()*40}});
-  if(g.obs.some(hit))die();
+  if(g.obs.some(hit))die();else if(g.rt>=CFG.DUR)die(true);
 }
 
 /* ---------- วาด ---------- */
@@ -5420,17 +5434,19 @@ function draw(dt){const g=G;
   for(let i=0;i<9;i++){const x=((i*47-g.dist*.9)%W+W)%W;rect(x,GY+8+(i%3)*7,5,2,'#a8dba2')}
   g.obs.forEach(o=>o.k==='bird'?drawBird(o):drawCactus(o));
   drawPetD(dt);
+  if(g.state==='run'){const sp=(g.speed-CFG.V0)/(CFG.VEND-CFG.V0);for(let i=0;i<Math.round(sp*8);i++){rect(((i*83-g.dist*1.6)%W+W)%W,22+(i*19)%100,16+sp*30,1,'rgba(255,255,255,.75)')}
+    if(g.lvt>0){c.save();c.globalAlpha=Math.min(1,g.lvt);c.font='bold 16px sans-serif';c.textAlign='center';c.fillStyle='#8b6cff';c.fillText('⚡ ความเร็วระดับ '+g.lvl,W/2,40);c.restore()}}
   if(g.state==='run'&&Math.floor(g.score)%100===0&&g.score>=100)g.flash=.4;
   if(g.flash>0){g.flash-=dt;c.fillStyle='rgba(255,255,255,'+Math.min(.35,g.flash)+')';c.fillRect(0,0,W,H)}}
 
 /* ---------- จบเกม + รางวัล ---------- */
-function die(){const g=G;if(g.state==='dead')return;g.state='dead';g.duck=false;
+function die(win){const g=G;if(g.state==='dead')return;g.state='dead';g.duck=false;if(win)g.score+=CFG.WIN_BONUS;
   const sc=Math.floor(g.score),nb=sc>best();if(nb)P.dinoBest=sc;
   let hap=0,coin=0;if(P&&!P.dead){hap=Math.max(CFG.HAP_MIN,Math.min(CFG.HAP_MAX,CFG.HAP_MIN+Math.floor(sc/CFG.HAP_PER)));
     P.hap=clamp(P.hap+hap);P.en=clamp(P.en-CFG.ENERGY);try{coin=Math.min(CFG.COIN_MAX,CFG.COIN_MIN+Math.floor(sc/CFG.COIN_PER));window.dnReward&&window.dnReward(coin)}catch(e){coin=0}try{hs('play')}catch(e){}try{qAdd('play')}catch(e){}try{addBond(1)}catch(e){}try{update()}catch(e){}save(true)}
-  paintHud();
+  paintHud();if(nb){try{typeof socPublish==='function'&&socPublish()}catch(e){}}paintLb();
   setTimeout(()=>{if(!isOpen)return;const msg=needMsg();
-    showOv('<b style="font-size:20px">💥 ชนแล้ว!</b><div style="font-size:22px">คะแนน '+sc+(nb?' 🏆 สถิติใหม่!':'')+'</div><div style="font-size:13px">สูงสุด '+best()+'</div><div>😊 สุข +'+hap+' · ⚡ พลังงาน −'+CFG.ENERGY+(coin?' · 🪙 +'+coin:'')+'</div>'
+    showOv('<b style="font-size:20px">'+(win?'🏁 รอดครบ 1 นาที! (+'+CFG.WIN_BONUS+')':'💥 ชนแล้ว!')+'</b><div style="font-size:22px">คะแนน '+sc+(nb?' 🏆 สถิติใหม่!':'')+'</div><div style="font-size:13px">สูงสุด '+best()+rankTxt()+'</div><div>😊 สุข +'+hap+' · ⚡ พลังงาน −'+CFG.ENERGY+(coin?' · 🪙 +'+coin:'')+'</div>'
       +'<div class="row"><button id="dnAgain" class="on" '+(msg?'disabled':'')+'>'+(msg?'พักก่อนนะ':'🔁 เล่นอีกครั้ง')+'</button><button id="dnX">ปิด</button></div>');
     $q('#dnAgain').onclick=()=>{const mm=needMsg();if(mm)return toast(mm);newGame();readyOv();start()};$q('#dnX').onclick=close},700)}
 
@@ -5450,7 +5466,7 @@ db.addEventListener('pointerdown',e=>{e.preventDefault();if(G&&G.state==='run')d
 
 function open(){if(!P)return;const msg=needMsg();if(msg)return toast(msg);
   rt.panel=null;try{renderPanel()}catch(e){}
-  m.classList.remove('hide');isOpen=true;duckHeld=false;newGame();readyOv();paintHud();
+  m.classList.remove('hide');isOpen=true;duckHeld=false;newGame();readyOv();paintHud();paintLb();try{typeof socRefresh==='function'&&Promise.resolve(socRefresh()).then(()=>{if(isOpen)paintLb()})}catch(e){}
   document.addEventListener('keydown',onKey);document.addEventListener('keyup',onKey);lastT=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop)}
 function close(){isOpen=false;cancelAnimationFrame(raf);m.classList.add('hide');document.removeEventListener('keydown',onKey);document.removeEventListener('keyup',onKey);duckHeld=false;G=null}
 $q('#dnClose').onclick=close;
