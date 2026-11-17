@@ -1623,15 +1623,15 @@ function chooseAnim(p,now){
 const SUPA_URL='https://qibpchabdkbptdrginit.supabase.co', SUPA_KEY='sb_publishable_zhrOrPsGWEHLZTKz-ptCpA_Ox7Czusb';   // ← ใส่ Project URL และ anon public key จาก Supabase (Project Settings → API)
 const KEY='pixelpets_v1';
 const sb=(SUPA_URL&&window.supabase)?supabase.createClient(SUPA_URL,SUPA_KEY):null;
-let user=null,cloudT=null,cloudStamp=null,cloudBusy=false;   // cloudStamp = เวอร์ชัน (updated_at) ของเซฟบนคลาวด์ที่เครื่องนี้รู้ล่าสุด
+let user=null,cloudT=null,cloudStamp=null,cloudBusy=false,wiping=false;   // wiping = กำลังเริ่มตัวใหม่: ห้ามเซฟทับจนกว่าจะเริ่มเกมใหม่   // cloudStamp = เวอร์ชัน (updated_at) ของเซฟบนคลาวด์ที่เครื่องนี้รู้ล่าสุด
 const lkey=()=>KEY+'_'+(user?user.id:'guest');
 function save(now){
-  if(!P)return;
+  if(!P||wiping)return;
   try{localStorage.setItem(lkey(),JSON.stringify(P))}catch(e){}
   if(sb&&user){clearTimeout(cloudT);cloudT=setTimeout(cloudSave,now?0:1500)}
 }
 async function cloudSave(){
-  if(!P||!user||!sb)return;
+  if(!P||!user||!sb||wiping)return;
   if(cloudBusy){clearTimeout(cloudT);cloudT=setTimeout(cloudSave,700);return}
   cloudBusy=true;
   try{
@@ -1675,6 +1675,8 @@ async function load(){
   try{return JSON.parse(localStorage.getItem(lkey()))}catch(e){return null}
 }
 async function wipe(){
+  wiping=true;clearTimeout(cloudT);                                   // หยุดเซฟที่ค้างอยู่ก่อน แล้วรอเซฟที่กำลังส่งอยู่ให้จบ ไม่งั้นมันจะสร้างตัวเก่ากลับมาหลังลบ
+  while(cloudBusy)await new Promise(r=>setTimeout(r,80));
   try{localStorage.removeItem(lkey())}catch(e){}
   if(sb&&user)await sb.from('player_saves').delete().eq('user_id',user.id);
   cloudStamp=null;
@@ -2901,7 +2903,8 @@ const starStr=n=>'<span class="stars">'+'★'.repeat(n)+'<i>'+'★'.repeat(STAR.
 const starRwTxt=q=>[q.coins?'🪙 '+q.coins:'',q.tokens?'⚔️ Token ×'+q.tokens:'',q.stones?'💠 หินอัพเกรด ×'+q.stones:'',q.crystals?'💎 คริสตัลวิวัฒนาการ ×'+q.crystals:'',q.meds?'💊 ยารักษา ×'+q.meds:''].filter(Boolean).join(' + ');
 const starHint=()=>bt&&!bt.duel&&bt.area?' · ⭐'+starOf(bt):'';   // ป้ายใน HUD: ถ้าชนะตอนนี้จะได้กี่ดาว
 let starDirty=false;
-function starMerge(st){if(!P||!st)return;P.stars=P.stars||{};P.starClaims=P.starClaims||{};   // รวมค่าจากเซิร์ฟเวอร์เข้าเครื่อง (ดาวสูงสุดต่อด่าน · รางวัลที่รับแล้วแบบ union)
+function starMerge(st){if(!P||!st||(st.pet&&P.uid&&st.pet!==P.uid))return;   // ผลของสัตว์ตัวอื่น (เช่น เพิ่งเริ่มตัวใหม่/สลับตัว) ไม่รวมเข้าตัวนี้
+ P.stars=P.stars||{};P.starClaims=P.starClaims||{};   // รวมค่าจากเซิร์ฟเวอร์เข้าเครื่อง (ดาวสูงสุดต่อด่าน · รางวัลที่รับแล้วแบบ union)
   for(const a in (st.stars||{})){const o=P.stars[a]=P.stars[a]||{};for(const j in st.stars[a])o[j]=Math.max(o[j]||0,+st.stars[a][j]||0)}
   for(const a in (st.claimed||{})){const c=P.starClaims[a]=P.starClaims[a]||[];(st.claimed[a]||[]).forEach(m=>{if(!c.includes(m))c.push(m)})}}
 function starClaimLocal(a){   // ไม่ล็อกอิน: แจกรางวัลในเครื่อง
@@ -2923,20 +2926,20 @@ function starGrantedUi(a,g,tail){   // แสดงรางวัลที่�
 async function starSubmit(sr){   // ส่งผลดาวของด่านที่เพิ่งชนะ → รางวัลดาวสะสม (ล็อกอิน = server · ไม่ล็อกอิน = ในเครื่อง)
   const a=AREAS.find(x=>x.id===sr.a);if(!a)return;let g=null;
   if(!socOn())g=starClaimLocal(a);
-  else{const r=await socCall('star_submit',{p_area:sr.a,p_stage:sr.j,p_stars:sr.stars,p_skip:[]});
-    if(!r||r.ok===false){starDirty=true;if(r&&r.msg&&!/star_submit|function|schema cache/i.test(r.msg))toast('⭐ '+r.msg);return}   // ส่งไม่สำเร็จ: ดาวยังอยู่ในเครื่อง รอซิงก์รอบถัดไป
+  else{const r=await socCall('star_submit',{p_area:sr.a,p_stage:sr.j,p_stars:sr.stars,p_skip:[],p_pet:P.uid});
+    if(!r||r.ok===false){starDirty=true;if(r&&r.msg&&!r.pending&&!/star_submit|function|schema cache/i.test(r.msg))toast('⭐ '+r.msg);return}   // pending = สัตว์ตัวใหม่ยังเซฟขึ้นเซิร์ฟเวอร์ไม่ทัน → รอบถัดไปส่งใหม่   // ส่งไม่สำเร็จ: ดาวยังอยู่ในเครื่อง รอซิงก์รอบถัดไป
     starMerge(r);g=r.granted;if(typeof r.crystals==='number')P.inv.crystal=r.crystals;if(typeof r.tokens==='number')tokSet(r.tokens);if(g&&(g.coins||g.tokens||g.stones||g.crystals||g.meds)&&window.econFix)window.econFix()}
   starGrantedUi(a,g);save()}
 async function starSync(){   // ล็อกอินแล้ว: ดึงดาวจากเซิร์ฟเวอร์ + ส่งดาวที่เครื่องมีมากกว่า (เล่นออฟไลน์/ส่งไม่สำเร็จ) · เกณฑ์ที่รับในเครื่องไปแล้วไม่แจกซ้ำ
   if(!socOn()||!P||starSync.busy)return;starSync.busy=true;starDirty=false;
-  try{const g=await socCall('star_get');if(!g||g.ok===false)return;starMerge(g);
+  try{const g=await socCall('star_get',{p_pet:P.uid});if(!g||g.ok===false)return;starMerge(g);
     for(const a of AREAS)for(let j=1;j<=SUBN;j++){const l=starGet(a,j),sv=+(((g.stars||{})[a.id]||{})[j])||0;
       if(l>sv){const skip=((P.starClaims||{})[a.id]||[]).filter(m=>!(((g.claimed||{})[a.id]||[]).includes(m)));
-        const r=await socCall('star_submit',{p_area:a.id,p_stage:j,p_stars:l,p_skip:skip});
+        const r=await socCall('star_submit',{p_area:a.id,p_stage:j,p_stars:l,p_skip:skip,p_pet:P.uid});
         if(r&&r.ok!==false){starMerge(r);const q=r.granted;if(typeof r.crystals==='number')P.inv.crystal=r.crystals;if(typeof r.tokens==='number')tokSet(r.tokens);if(q&&(q.coins||q.tokens||q.stones||q.crystals||q.meds)){if(window.econFix)window.econFix();starGrantedUi(a,q)}}else starDirty=true}}
     try{if(rt&&rt.panel==='battle')renderPanel();save()}catch(e){}}
   finally{starSync.busy=false}}
-setInterval(()=>{try{const id=socOn()&&P&&user.id;if(id&&(starSync.id!==id||starDirty)){starSync.id=id;starSync()}}catch(e){}},2500);
+setInterval(()=>{try{const id=socOn()&&P&&(user.id+':'+P.uid);if(id&&(starSync.id!==id||starDirty)){starSync.id=id;starSync()}}catch(e){}},2500);
 function starPanelHtml(a){   // กล่องดาวสะสมของพื้นที่ (หน้าเลือกด่านย่อย)
   const tot=starTotal(a),mx=SUBN*STAR.max,rw=STAR.rw[a.id];
   let h='<div class="starp"><div><b>⭐ ดาวสะสม '+tot+'/'+mx+'</b></div><div class="sbar"><b style="width:'+Math.round(tot/mx*100)+'%"></b></div>';
@@ -4325,7 +4328,7 @@ async function resetEconItems(){   // รีเซ็ตไอเทมที่
 }
 $('#reset').onclick=async()=>{if(!confirm('เริ่มใหม่ทั้งหมด? สัตว์เลี้ยงและไอเทมทั้งหมดจะหายไป'))return;await wipe();await resetEconItems();P=null;$('#game').classList.add('hide');$('#setup').classList.remove('hide')};
 async function again(){await wipe();await resetEconItems();P=null;rt.panel=null;$('#game').classList.add('hide');$('#setup').classList.remove('hide')}   // ต้อง await ก่อน ไม่งั้น econ_get อาจดึงของเก่ากลับมา
-function startGame(){tokPull();evoPull();if(!tokPull.t){tokPull.t=setInterval(tokPull,60000);setInterval(evoPull,60000)}$('#setup').classList.add('hide');$('#game').classList.remove('hide');buildBars();dailyBonus();renderPanel();update();save();if(!soc.ready&&socOn())socStart([])}
+function startGame(){wiping=false;tokPull();evoPull();if(!tokPull.t){tokPull.t=setInterval(tokPull,60000);setInterval(evoPull,60000)}$('#setup').classList.add('hide');$('#game').classList.remove('hide');buildBars();dailyBonus();renderPanel();update();save();if(!soc.ready&&socOn())socStart([])}
 
 async function enter(){   // เรียกหลังล็อกอินแล้ว (หรือเล่นออฟไลน์เมื่อยังไม่ตั้งค่า Supabase)
   $('#auth').classList.add('hide');
