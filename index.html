@@ -5474,7 +5474,7 @@ window.openDino=open;window.__dnG=()=>G;
 })();
 </script>
 
-<!-- ===== v23: SFX ดูแลมังกร (กิน · เดิน · นอน · อาบน้ำ · รักษา) · สังเคราะห์ด้วย WebAudio ทั้งหมด ไม่ใช้ไฟล์เสียง · เสียงเปลี่ยนตามวัย (Baby→Ascended) และธาตุ (8 ธาตุ) · ตามสวิตช์ 🔊/🔇 (pp_bgm) ===== -->
+<!-- ===== v23: SFX ดูแลมังกร/สไลม์/ยูนิคอร์น (กิน · เดิน · นอน · อาบน้ำ · รักษา) · สังเคราะห์ด้วย WebAudio ทั้งหมด ไม่ใช้ไฟล์เสียง · เสียงเปลี่ยนตามวัย (Baby→Ascended) และธาตุ (8 ธาตุ) · ตามสวิตช์ 🔊/🔇 (pp_bgm) ===== -->
 <script>
 (function(){
 const VOL=.38;   // ความดังรวมของ SFX ดูแล · ปรับตัวเลขนี้ถ้าเบา/ดังไป
@@ -5508,25 +5508,45 @@ const ACC={
 };
 const acc=(t,g)=>{const f=ACC[P.el];if(f)f(t,g)};   // เบบี้ที่ยังไม่มีธาตุ = ไม่มีเสียงเสริม
 /* ---------- เสียงแต่ละกิจกรรม ---------- */
-function sStep(v,t,k){   // ก้าวเดิน (มังกรเงาวัยรุ่นวาป → เสียงวูบแทน)
+function dStep(v,t,k){   // ก้าวเดิน (มังกรเงาวัยรุ่นวาป → เสียงวูบแทน)
   if(typeof isShadY==='function'&&isShadY(P)){nz(t,.2,.16,'bandpass',1800,500);tone(t,420*v.p,.18,'sine',.12,160*v.p);return}
   tone(t,150*v.p,.09,'sine',.5*v.w,60*v.p);nz(t,.05,.18*v.w,'lowpass',900*v.p,300);
   if(v.w>1.2){tone(t,55,.2,'sine',.3);nz(t+.02,.12,.08,'lowpass',200)}   // Ascended: ก้าวหนักสะเทือน
   if(k%2===0)acc(t+.01,.35)}
-function sChomp(v,t,k){const r=.92+Math.random()*.16;   // งับอาหาร
+function dChomp(v,t,k){const r=.92+Math.random()*.16;   // งับอาหาร
   nz(t,.07,.5,'bandpass',1800*v.p*r,600,1.5);tone(t,220*v.p*r,.06,'square',.1,120*v.p);tone(t+.05,500*v.p*r,.05,'sine',.14,300*v.p);
   if(k%2===0)acc(t+.02,.5)}
-function sGulp(v,t){tone(t,300*v.p,.18,'sine',.3,120*v.p);tone(t+.22,620*v.p,.1,'triangle',.18,900*v.p);tone(t+.34,760*v.p,.08,'triangle',.14,1000*v.p);acc(t+.2,.6)}   // กลืน + ร้องอร่อย
-function sSnore(v,t){nz(t,.7,.12,'lowpass',200*v.p,500*v.p);nz(t+.7,.9,.16,'lowpass',500*v.p,180*v.p);tone(t+.7,90*v.p,.9,'sawtooth',.06,70*v.p,260);acc(t+.75,.25)}   // หายใจเข้า-ออก
-function sLie(v,t){tone(t,180*v.p,.25,'sine',.4*v.w,70*v.p);nz(t,.2,.12*v.w,'lowpass',600,200);tone(t+.3,500*v.p,.5,'sine',.08,380*v.p)}   // ล้มตัวนอน + ถอนหายใจ
-function sYawn(v,t){tone(t,300*v.p,.7,'sawtooth',.1,520*v.p,900);tone(t+.55,520*v.p,.6,'sawtooth',.09,260*v.p,800);nz(t,1.1,.05,'lowpass',700)}   // หาว
-function sSplash(v,t,big){nz(t,big?.5:.3,big?.4:.2,'bandpass',1500,3500);for(let i=0;i<(big?4:1);i++){const f=(380+Math.random()*500)*v.p;tone(t+i*.07,f,.09,'sine',.22,f*1.8)}acc(t+.05,.5)}
-function sBub(v,t){const f=(420+Math.random()*600)*v.p;tone(t,f,.07,'sine',.2,f*1.9)}
+function dGulp(v,t){tone(t,300*v.p,.18,'sine',.3,120*v.p);tone(t+.22,620*v.p,.1,'triangle',.18,900*v.p);tone(t+.34,760*v.p,.08,'triangle',.14,1000*v.p);acc(t+.2,.6)}   // กลืน + ร้องอร่อย
+function dSnore(v,t){nz(t,.7,.12,'lowpass',200*v.p,500*v.p);nz(t+.7,.9,.16,'lowpass',500*v.p,180*v.p);tone(t+.7,90*v.p,.9,'sawtooth',.06,70*v.p,260);acc(t+.75,.25)}   // หายใจเข้า-ออก
+function dLie(v,t){tone(t,180*v.p,.25,'sine',.4*v.w,70*v.p);nz(t,.2,.12*v.w,'lowpass',600,200);tone(t+.3,500*v.p,.5,'sine',.08,380*v.p)}   // ล้มตัวนอน + ถอนหายใจ
+function dYawn(v,t){tone(t,300*v.p,.7,'sawtooth',.1,520*v.p,900);tone(t+.55,520*v.p,.6,'sawtooth',.09,260*v.p,800);nz(t,1.1,.05,'lowpass',700)}   // หาว
+/* ---------- 🟢 สไลม์: เสียงวุ้นเปียก/บลูป · 🦄 ยูนิคอร์น: เสียงกีบ/ระฆังเวท/ร้องเบา ---------- */
+function mStep(v,t,k){nz(t,.09,.3*v.w,'bandpass',500*v.p,200*v.p,3);tone(t,260*v.p,.11,'sine',.35*v.w,110*v.p);if(k%2===0){tone(t+.06,180*v.p,.08,'sine',.18*v.w,300*v.p);acc(t+.01,.35)}}   // ตุ๊บเปียก ๆ
+function mChomp(v,t,k){const r=.92+Math.random()*.16;nz(t,.14,.35,'bandpass',900*v.p*r,2200*v.p,4);tone(t,300*v.p*r,.12,'sine',.25,700*v.p*r);if(k%2===0)acc(t+.02,.5)}   // ซู้ดวุ้น
+function mGulp(v,t){tone(t,500*v.p,.1,'sine',.3,200*v.p);tone(t+.12,420*v.p,.1,'sine',.28,160*v.p);tone(t+.3,300*v.p,.18,'sine',.25,800*v.p);acc(t+.2,.6)}   // อึก อึก + บลูปดีใจ
+function mSnore(v,t){for(let i=0;i<3;i++){tone(t+i*.35,140*v.p,.28,'sine',.12,90*v.p,400);nz(t+i*.35,.2,.05,'lowpass',300*v.p)}acc(t+.5,.25)}   // ฟองหายใจพรืด ๆ
+function mLie(v,t){nz(t,.18,.3,'lowpass',900,150);tone(t,200*v.p,.3,'sine',.35*v.w,70*v.p);tone(t+.2,300*v.p,.4,'sine',.1,200*v.p)}   // ตุ้บแหวะลงกอง
+function mYawn(v,t){tone(t,180*v.p,.5,'sine',.2,520*v.p);tone(t+.5,520*v.p,.4,'sine',.18,200*v.p)}   // บลู้ปยืดตัว
+function mBub(v,t){const f=(260+Math.random()*300)*v.p;tone(t,f,.09,'sine',.22,f*2.2)}
+function uStep(v,t,k){const a=k%2;nz(t,.03,.35*v.w,'bandpass',2200*v.p,1500,3);tone(t,(a?620:820)*v.p,.06,'triangle',.4*v.w,(a?420:560)*v.p);if(a===0)acc(t+.01,.35)}   // ก๊อก-แก๊ก กีบม้า
+function uChomp(v,t,k){const r=.92+Math.random()*.16;nz(t,.06,.4,'bandpass',2400*v.p*r,900,1.5);tone(t,320*v.p*r,.05,'triangle',.12,200*v.p);if(k%2===0)acc(t+.02,.5)}   // เคี้ยวกรอบเบา ๆ
+function uGulp(v,t){tone(t,380*v.p,.15,'sine',.25,170*v.p);tone(t+.2,1000*v.p,.12,'triangle',.2,1500*v.p);tone(t+.32,1500*v.p,.15,'triangle',.18,1000*v.p);acc(t+.2,.6)}   // กลืน + ร้องฮี้เบา ๆ
+function uSnore(v,t){nz(t,.5,.1,'lowpass',250*v.p,600*v.p);nz(t+.5,.8,.12,'lowpass',600*v.p,220*v.p);tone(t+.5,150*v.p,.7,'triangle',.05,120*v.p,300);tone(t+.9,1760,.4,'sine',.04);acc(t+.75,.25)}   // หายใจนุ่ม + ระฆังจิ๋ว
+function uLie(v,t){tone(t,140*v.p,.2,'sine',.35*v.w,70*v.p);nz(t,.15,.15,'lowpass',700,200);tone(t+.3,700*v.p,.5,'triangle',.07,500*v.p)}   // ทิ้งตัว + ถอนหายใจ
+function uYawn(v,t){tone(t,500*v.p,.4,'triangle',.14,900*v.p,1800);tone(t+.35,900*v.p,.5,'triangle',.13,420*v.p,1600)}   // ฮี้ยืดเสียงนุ่ม
+function uBub(v,t){const f=(1100+Math.random()*800)*v.p;tone(t,f,.18,'sine',.14,f*1.2)}   // ติ๊งประกาย
+const SPV={dragon:{step:dStep,chomp:dChomp,gulp:dGulp,snore:dSnore,lie:dLie,yawn:dYawn,bub:dBub},
+  slime:{step:mStep,chomp:mChomp,gulp:mGulp,snore:mSnore,lie:mLie,yawn:mYawn,bub:mBub},
+  unicorn:{step:uStep,chomp:uChomp,gulp:uGulp,snore:uSnore,lie:uLie,yawn:uYawn,bub:uBub}};
+const sStep=(v,t,k)=>SPV[P.sp].step(v,t,k),sChomp=(v,t,k)=>SPV[P.sp].chomp(v,t,k),sGulp=(v,t)=>SPV[P.sp].gulp(v,t),sSnore=(v,t)=>SPV[P.sp].snore(v,t),sLie=(v,t)=>SPV[P.sp].lie(v,t),sYawn=(v,t)=>SPV[P.sp].yawn(v,t),sBub=(v,t)=>SPV[P.sp].bub(v,t);
+const SPF=()=>P.sp==='slime'?.6:P.sp==='unicorn'?1.25:1;
+function sSplash(v,t,big){nz(t,big?.5:.3,big?.4:.2,'bandpass',1500,3500);for(let i=0;i<(big?4:1);i++){const f=(380+Math.random()*500)*v.p*SPF();tone(t+i*.07,f,.09,'sine',.22,f*1.8)}acc(t+.05,.5)}
+function dBub(v,t){const f=(420+Math.random()*600)*v.p;tone(t,f,.07,'sine',.2,f*1.9)}
 function sSparkle(v,t,g){[523,659,784,1047,1319].forEach((f,i)=>tone(t+i*.08,f,.3,'triangle',.16*g));acc(t+.1,1.2*g)}
 function sHeal(cue,v,t,e){
   if(cue==='start'){tone(t,660,.12,'sine',.2);tone(t+.14,880,.14,'sine',.2)}
   else if(cue==='dn'){nz(t,.25,.12,'highpass',5000,8000);tone(t,2400,.2,'triangle',.05,3000)}                              // เข็มเปล่งประกาย
-  else if(cue==='jab'){tone(t,1200,.05,'square',.18,600);tone(t+.03,700*v.p,.16,'sawtooth',.15,1300*v.p,1500)}              // ทิ่ม + ร้องสะดุ้ง
+  else if(cue==='jab'){tone(t,1200,.05,'square',.18,600);{const sp=P.sp;if(sp==='slime'){tone(t+.03,300*v.p,.25,'sine',.25,700*v.p);tone(t+.2,700*v.p,.15,'sine',.2,250*v.p)}else if(sp==='unicorn'){tone(t+.03,900*v.p,.12,'triangle',.2,1600*v.p);tone(t+.15,1600*v.p,.2,'triangle',.18,800*v.p)}else tone(t+.03,700*v.p,.16,'sawtooth',.15,1300*v.p,1500)}}              // ทิ่ม + ร้องสะดุ้ง
   else if(cue==='hum'){tone(t,(300+e*35)*(1+(v.p-1)*.3),.45,'sine',.08)}                                                    // ยาเข้าตัว
   else if(cue==='inj'){nz(t,.6,.14,'highpass',3500,6000)}                                                                   // ดันยา
   else if(cue==='out'){tone(t,900,.04,'square',.14,300);nz(t+.02,.25,.1,'lowpass',2000,600)}                                // ดึงเข็มออก
@@ -5537,7 +5557,7 @@ function audible(){const now=performance.now();if(now-mt>300){mt=now;mute=!on()|
 function tick(){requestAnimationFrame(tick);
   try{
     if(typeof P==='undefined'||!P||typeof player==='undefined'||!player)return;
-    const ok=P.sp==='dragon'&&!P.dead&&!P.adv&&audible()&&init()&&ac.state==='running';
+    const ok=!!SPV[P.sp]&&!P.dead&&!P.adv&&audible()&&init()&&ac.state==='running';
     const v=ok?voice():null,t=ok?ac.currentTime+.02:0,nm=player.name,f=player.f,now=performance.now();
     const fr=(typeof FR==='number'&&FR>1)?FR:6;
     /* เดิน: ก้าวเท้า 2 ครั้งต่อรอบอนิเมชัน */
