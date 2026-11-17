@@ -5514,8 +5514,23 @@ const ACC={
 };
 const acc=(t,g)=>{const f=ACC[P.el];if(f)f(t,g)};   // เบบี้ที่ยังไม่มีธาตุ = ไม่มีเสียงเสริม
 /* ---------- เสียงแต่ละกิจกรรม ---------- */
+/* 🌿 ธรรมชาติ Adult/Ascended: กระพือปีกบิน · 💧 น้ำ Adult: เลื้อย · 🌑 เงา Young: เทเลพอต (3 ท่านี้ใช้แทนเสียงก้าวเท้า) */
+function dFlap(v,t,k){const dn=k%2===0;   // ปีกฟาดลง (หนัก) สลับ ยกขึ้น (เบา)
+  if(dn){nz(t,.32,.42*v.w,'lowpass',950*v.p,260*v.p);tone(t,95*v.p,.28,'sine',.3*v.w,48*v.p);nz(t+.05,.2,.12*v.w,'bandpass',1800*v.p,900,1.2);acc(t+.02,.35)}
+  else{nz(t,.22,.16*v.w,'bandpass',1300*v.p,700*v.p,1.2);tone(t,70*v.p,.15,'sine',.1*v.w,50*v.p)}
+  if(v.w>1.2&&dn)tone(t,46,.4,'sine',.3)}   // Ascended: ลมปีกกระแทกทุ้มลึก
+function dSlither(v,t,k){const a=k%2===0;   // เลื้อยไถลเปียก ๆ: ลมซู่ไล่ระดับขึ้น-ลง + น้ำเมือกลื่น
+  nz(t,.5,.22*v.w,'bandpass',(a?900:2100)*v.p,(a?2100:900)*v.p,1.6);nz(t+.1,.4,.06,'highpass',4200,6500);
+  tone(t,(a?110:150)*v.p,.45,'sine',.07*v.w,(a?150:100)*v.p,400);if(k%2===0)acc(t+.08,.4)}
+function sTeleport(v,t){   // ตามไทม์ไลน์วาป: 0–1.1s สะสมพลัง · 1.1s หายวับ · 1.3s ปรากฏที่ใหม่ (TP1=1.1 · TPG=.2)
+  tone(t,300*v.p,1.05,'sine',.09,1800*v.p);nz(t,1.0,.08,'highpass',2000,7000);
+  for(let i=0;i<4;i++)tone(t+.15+i*.25,110*v.p,.14,'sine',.12,70*v.p);   // ชีพจรเงาเต้นถี่ขึ้น
+  const a=t+1.1;tone(a,1800*v.p,.18,'sawtooth',.2,200*v.p,3000);nz(a,.2,.26,'bandpass',6000,400,1.5);tone(a,70,.25,'sine',.18,35);   // ฟิ้ว-ปึก หายวับ
+  const b=t+1.3;tone(b,200*v.p,.22,'sawtooth',.18,1500*v.p,3000);nz(b,.26,.22,'bandpass',500,5000,1.5);tone(b+.02,2400*v.p,.16,'triangle',.08);acc(b,.7)}   // ปรากฏ + ประกาย
 function dStep(v,t,k){   // ก้าวเดิน (มังกรเงาวัยรุ่นวาป → เสียงวูบแทน)
-  if(typeof isShadY==='function'&&isShadY(P)){nz(t,.2,.16,'bandpass',1800,500);tone(t,420*v.p,.18,'sine',.12,160*v.p);return}
+  if(typeof isShadY==='function'&&isShadY(P))return;   // มังกรเงา Young: เสียงเทเลพอตเล่นแยกตามไทม์ไลน์วาป (sTeleport)
+  if(P.el==='nature'&&P.stage>=2)return dFlap(v,t,k);
+  if(P.el==='water'&&P.stage===2)return dSlither(v,t,k);
   tone(t,150*v.p,.09,'sine',.5*v.w,60*v.p);nz(t,.05,.18*v.w,'lowpass',900*v.p,300);
   if(v.w>1.2){tone(t,55,.2,'sine',.3);nz(t+.02,.12,.08,'lowpass',200)}   // Ascended: ก้าวหนักสะเทือน
   if(k%2===0)acc(t+.01,.35)}
@@ -5558,7 +5573,7 @@ function sHeal(cue,v,t,e){
   else if(cue==='out'){tone(t,900,.04,'square',.14,300);nz(t+.02,.25,.1,'lowpass',2000,600)}                                // ดึงเข็มออก
   else if(cue==='done'){sSparkle(v,t,1.1)}}
 /* ---------- ตัวตรวจสถานะ (เล่นเสียงตามอนิเมชัน/สถานะจริงของเกม ไม่แตะโค้ดเดิม) ---------- */
-let lName='',lF=-1,stepN=0,chompN=0,lSleep=false,lBath=false,lHeal=false,hf={},nextSnore=0,nextBub=0,nextHum=0,lastHumE=-1,mute=false,mt=0;
+let lTp=0,lName='',lF=-1,stepN=0,chompN=0,lSleep=false,lBath=false,lHeal=false,hf={},nextSnore=0,nextBub=0,nextHum=0,lastHumE=-1,mute=false,mt=0;
 function audible(){const now=performance.now();if(now-mt>300){mt=now;mute=!on()||document.hidden||!!document.querySelector('.modal:not(.hide)')}return !mute}
 function tick(){requestAnimationFrame(tick);
   try{
@@ -5568,6 +5583,8 @@ function tick(){requestAnimationFrame(tick);
     const fr=(typeof FR==='number'&&FR>1)?FR:6;
     /* เดิน: ก้าวเท้า 2 ครั้งต่อรอบอนิเมชัน */
     if(nm==='walk'&&f!==lF&&f%Math.max(1,fr>>1)===0){if(ok&&!P.sleeping)sStep(v,t,stepN);stepN++}
+    /* เทเลพอต: มังกรเงา Young วาปทุกครั้งที่เกมเริ่มวาปใหม่ (rt.tp) */
+    {const tp=typeof rt!=='undefined'&&rt&&rt.tp;if(tp&&tp.t0!==lTp){lTp=tp.t0;if(ok&&typeof isShadY==='function'&&isShadY(P))sTeleport(v,t)}}
     /* กิน: งับตามเฟรม · จบ = กลืน */
     if(nm==='eat'&&f!==lF&&f%2===0){if(ok)sChomp(v,t,chompN);chompN++}
     if(lName==='eat'&&nm!=='eat'){if(ok)sGulp(v,t);chompN=0}
@@ -5617,6 +5634,6 @@ window.kitSfx=function(p,now){try{
   if(m==='sleep'&&tn>=kNext){if(ok)kPurr(t);kNext=tn+2600}
 }catch(e){}};
 requestAnimationFrame(tick);
-window.psfx={test(k){try{init();if(!ac)return;const v=voice(),t=ac.currentTime+.05;({step:()=>sStep(v,t,0),eat:()=>sChomp(v,t,0),gulp:()=>sGulp(v,t),snore:()=>sSnore(v,t),bath:()=>sSplash(v,t,true),heal:()=>sHeal('jab',v,t,0),done:()=>sSparkle(v,t,1),meow:()=>kMeow(t,'mew'),hi:()=>kMeow(t,'hi'),mrrp:()=>kMeow(t,'mrrp'),purr:()=>kPurr(t),yawn:()=>kYawn(t)})[k]()}catch(e){}}};   // ทดสอบจาก console: psfx.test('eat')
+window.psfx={test(k){try{init();if(!ac)return;const v=voice(),t=ac.currentTime+.05;({step:()=>sStep(v,t,0),eat:()=>sChomp(v,t,0),gulp:()=>sGulp(v,t),snore:()=>sSnore(v,t),bath:()=>sSplash(v,t,true),heal:()=>sHeal('jab',v,t,0),done:()=>sSparkle(v,t,1),flap:()=>dFlap(v,t,0),slither:()=>dSlither(v,t,0),teleport:()=>sTeleport(v,t),meow:()=>kMeow(t,'mew'),hi:()=>kMeow(t,'hi'),mrrp:()=>kMeow(t,'mrrp'),purr:()=>kPurr(t),yawn:()=>kYawn(t)})[k]()}catch(e){}}};   // ทดสอบจาก console: psfx.test('eat')
 })();
 </script>
