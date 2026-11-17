@@ -4200,6 +4200,12 @@ function socOpenVisit(id){const fr=soc.friends.find(f=>f.id===id);if(!fr)return;
   soc.visit={fr,pa:new AnimPlayer(),fl:[],eatUntil:0,teaseUntil:0,lt:0,lastBar:0};$('#frMsg').textContent='';$('#frSub').classList.add('hide');
   $('#frTitle').textContent='🏠 บ้านของ '+fr.name;$('#frModal').classList.remove('hide');visitOn=true;renderVisit();requestAnimationFrame(visitLoop);socCdLoad(id).then(()=>{if(soc.visit)renderVisit()})}
 function socCloseVisit(){visitOn=false;soc.visit=null;$('#frModal').classList.add('hide')}
+function frHint(e,away){   // บอกเหตุผลที่ปุ่ม ป้อนยา/ทำความสะอาด กดไม่ได้ (ปุ่ม disabled ไม่มี tooltip บนมือถือ)
+  let el=$('#frHint');if(!el){el=document.createElement('div');el.id='frHint';el.className='mut';el.style.cssText='font-size:12.5px;margin:6px 0;text-align:left';$('#frAct').after(el)}
+  const h=[];
+  if(e.sick){if(!away)h.push('💊 ป้อนยาไม่ได้ตอนนี้: เจ้าของยังออนไลน์อยู่ (ต้องออฟไลน์เกิน 3 นาที)');else if(!((P.inv.med||0)>0))h.push('💊 ป้อนยาไม่ได้: ไม่มียาในกระเป๋า — ซื้อยาได้ที่ 🛒 ร้านค้า แล้วกลับมาป้อนใหม่')}
+  if(e.clean<40&&!away)h.push('🫧 ทำความสะอาดไม่ได้ตอนนี้: เจ้าของยังออนไลน์อยู่');
+  el.innerHTML=h.join('<br>')}
 function renderVisit(){const V=soc.visit;if(!V)return;const pet=V.fr.pet,{e,age}=socEst(V.fr),away=age>=SOC_AWAY;V.est=e;
   const nm=speciesName({sp:pet.sp,stage:pet.stage,el:pet.el});
   $('#frInfo').innerHTML='<b>'+esc(pet.name)+'</b> '+(pet.gender==='M'?'♂':'♀')+' · '+esc(nm)+' · Lv.'+pet.lv+(pet.el?' '+EL[pet.el].e:'')+'<br>'
@@ -4211,7 +4217,7 @@ function renderVisit(){const V=soc.visit;if(!V)return;const pet=V.fr.pet,{e,age}
   q('clean').disabled=!(away&&e.clean<40);q('medicine').disabled=!(away&&e.sick&&(P.inv.med||0)>0);q('feed').disabled=false;
   q('clean').title=away?'':'ต้องรอให้เจ้าของออฟไลน์';q('duel').disabled=!!btReady();q('duel').title=btReady()||'';q('medicine').title=away?((P.inv.med||0)>0?'':'ต้องมียาในกระเป๋า'):'ต้องรอให้เจ้าของออฟไลน์';
   ['pat','tease','feed','clean','medicine','duel'].forEach(k=>{const b=q(k);if(!b)return;if(b.dataset.t==null)b.dataset.t=b.textContent;
-    const l=socCdLeft(V.fr.id,k);b.textContent=l>0?b.dataset.t+' ⏳ '+socCdTxt(l):b.dataset.t;if(l>0){b.disabled=true;b.title='คูลดาวน์ 1 ชั่วโมง — รออีก '+socCdTxt(l)}})}   // คูลดาวน์ 1 ชม. ทุกปุ่ม
+    const l=socCdLeft(V.fr.id,k);b.textContent=l>0?b.dataset.t+' ⏳ '+socCdTxt(l):b.dataset.t;if(l>0){b.disabled=true;b.title='คูลดาวน์ 1 ชั่วโมง — รออีก '+socCdTxt(l)}});try{frHint(e,away)}catch(x){}}   // คูลดาวน์ 1 ชม. ทุกปุ่ม
 function visitLoop(t){if(!visitOn||!soc.visit)return;requestAnimationFrame(visitLoop);const V=soc.visit,c=$('#frCv').getContext('2d'),now=performance.now(),dt=Math.min(.1,(t-(V.lt||t))/1000);V.lt=t;
   if(now-V.lastBar>1000){V.lastBar=now;renderVisit()}
   c.imageSmoothingEnabled=false;['#cfeaff','#dff1ff','#f4e6ff','#ffe8f4'].forEach((col,i)=>R(c,0,i*21,192,22,col));R(c,0,86,192,34,'#c9f0c6');R(c,0,86,192,3,'#b2e6ae');R(c,0,104,192,16,'#b9e4b6');
@@ -5261,7 +5267,7 @@ function kitPos(now){const k=P&&P.kit;if(!k)return null;const e=now-k.t0,stayEnd
   if(e<stayEnd)return kitCycle(((e-KIT_IN)/1000)%60,A,B);
   const s0=kitCycle(((stayEnd-KIT_IN)/1000)%60,A,B),t=ease((e-stayEnd)/KIT_OUT);   // เดินออกจากตำแหน่งที่อยู่ ณ ตอนครบ 5 นาที
   return{x:s0.x+(edge-s0.x)*t,m:'walk',d:sgn(edge-s0.x)}}
-function drawKit(c,now){const p=kitPos(now);if(!p||p.gone||!KATLAS.complete||!KATLAS.width)return;
+function drawKit(c,now){const p=kitPos(now);try{window.kitSfx&&window.kitSfx(p,now)}catch(e){}if(!p||p.gone||!KATLAS.complete||!KATLAS.width)return;
   const fi=p.m==='walk'?5+Math.floor(now/120)%5:p.m==='idle'?KIDLE[Math.floor(now/400)%KIDLE.length]:p.m==='drowsy'?1:2+Math.floor(now/1600)%2;
   const w=KCW*KIT_SCALE*1.25,h=KCH*KIT_SCALE*1.25;   // atlas ทำไว้ 2 เท่า ของขนาดที่แสดง (KIT_SCALE .4 → ตรงกับขนาดเดิม)
   c.save();c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
@@ -5474,7 +5480,7 @@ window.openDino=open;window.__dnG=()=>G;
 })();
 </script>
 
-<!-- ===== v23: SFX ดูแลมังกร/สไลม์/ยูนิคอร์น (กิน · เดิน · นอน · อาบน้ำ · รักษา) · สังเคราะห์ด้วย WebAudio ทั้งหมด ไม่ใช้ไฟล์เสียง · เสียงเปลี่ยนตามวัย (Baby→Ascended) และธาตุ (8 ธาตุ) · ตามสวิตช์ 🔊/🔇 (pp_bgm) ===== -->
+<!-- ===== v23: SFX ดูแลมังกร/สไลม์/ยูนิคอร์น + ลูกแมวน้อย (กิน · เดิน · นอน · อาบน้ำ · รักษา) · สังเคราะห์ด้วย WebAudio ทั้งหมด ไม่ใช้ไฟล์เสียง · เสียงเปลี่ยนตามวัย (Baby→Ascended) และธาตุ (8 ธาตุ) · ตามสวิตช์ 🔊/🔇 (pp_bgm) ===== -->
 <script>
 (function(){
 const VOL=.38;   // ความดังรวมของ SFX ดูแล · ปรับตัวเลขนี้ถ้าเบา/ดังไป
@@ -5588,7 +5594,29 @@ function tick(){requestAnimationFrame(tick);
     lHeal=hl;lName=nm;lF=f;
   }catch(e){}
 }
+/* ---------- 🐱 ลูกแมวน้อย (แมวที่สัตว์เลี้ยงพากลับมาจากผจญภัย): เมี้ยวทักทาย · ฝีเท้าเบา ๆ · เมี้ยวสุ่มตอนนั่ง · หาวตอนง่วง · เสียงครืดคราดตอนหลับ · เมี้ยวลาตอนออกไป ---------- */
+function kMeow(t,kind){const r=.92+Math.random()*.16,L=kind==='hi'||kind==='bye';
+  if(kind==='mrrp'){tone(t,500*r,.07,'triangle',.16,800*r);tone(t+.08,800*r,.09,'triangle',.14,650*r);return}
+  const d1=L?.2:.14,d2=L?.38:.26,pk=(L?1150:1000)*r,vv=L?.16:.13;
+  tone(t,650*r,d1,'sawtooth',vv,pk,2600);tone(t+d1-.02,pk,d2,'sawtooth',vv,(kind==='bye'?520:700)*r,2200);   // เมี้ย… (ขึ้น) …ว (ลง)
+  tone(t,325*r,d1+d2,'triangle',.05,350*r);nz(t,d1+d2,.03,'bandpass',2800,1800,1.5)}                          // เสียงทุ้มรอง + ลมหายใจ
+function kPat(t){nz(t,.025,.07,'bandpass',3000,2000,2)}                                                       // ฝีเท้าจ๊อก ๆ
+function kYawn(t){tone(t,900,.35,'triangle',.08,1300,2400);tone(t+.3,1300,.25,'triangle',.07,700,2000)}     // หาวเมี้ยวจิ๋ว
+function kPurr(t){for(let i=0;i<30;i++)nz(t+i*.04,.03,.045,'lowpass',200,150);tone(t,110,1.2,'sine',.03)}    // ครืดคราด ~1.2 วิ
+let kM=null,kNext=0,kStep=0,kWas=false;
+window.kitSfx=function(p,now){try{
+  const vis=!!p&&!p.gone;if(!vis&&!kWas)return;
+  const ok=audible()&&init()&&ac.state==='running',t=ok?ac.currentTime+.02:0,tn=performance.now();
+  if(!vis){if(ok)kMeow(t,'bye');kWas=false;kM=null;return}
+  const m=p.m;
+  if(!kWas){kWas=true;if(ok)kMeow(t,'hi');kNext=tn+6000+Math.random()*6000}
+  else if(m!==kM){if(kM==='idle'&&m==='walk'&&ok)kMeow(t,'mrrp');if(m==='drowsy'&&kM==='walk'||m==='drowsy'&&kM==='idle'){if(ok)kYawn(t)}if(m==='sleep')kNext=tn+800}
+  kM=m;
+  if(m==='walk'&&tn>=kStep){if(ok)kPat(t);kStep=tn+240}
+  if(m==='idle'&&tn>=kNext){if(ok)kMeow(t,Math.random()<.3?'mrrp':'mew');kNext=tn+7000+Math.random()*9000}
+  if(m==='sleep'&&tn>=kNext){if(ok)kPurr(t);kNext=tn+2600}
+}catch(e){}};
 requestAnimationFrame(tick);
-window.psfx={test(k){try{init();if(!ac)return;const v=voice(),t=ac.currentTime+.05;({step:()=>sStep(v,t,0),eat:()=>sChomp(v,t,0),gulp:()=>sGulp(v,t),snore:()=>sSnore(v,t),bath:()=>sSplash(v,t,true),heal:()=>sHeal('jab',v,t,0),done:()=>sSparkle(v,t,1)})[k]()}catch(e){}}};   // ทดสอบจาก console: psfx.test('eat')
+window.psfx={test(k){try{init();if(!ac)return;const v=voice(),t=ac.currentTime+.05;({step:()=>sStep(v,t,0),eat:()=>sChomp(v,t,0),gulp:()=>sGulp(v,t),snore:()=>sSnore(v,t),bath:()=>sSplash(v,t,true),heal:()=>sHeal('jab',v,t,0),done:()=>sSparkle(v,t,1),meow:()=>kMeow(t,'mew'),hi:()=>kMeow(t,'hi'),mrrp:()=>kMeow(t,'mrrp'),purr:()=>kPurr(t),yawn:()=>kYawn(t)})[k]()}catch(e){}}};   // ทดสอบจาก console: psfx.test('eat')
 })();
 </script>
