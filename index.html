@@ -4327,7 +4327,23 @@ document.addEventListener('click',e=>{
   if(b.dataset.a)act(b.dataset.a);
 });
 $('#rnd').onclick=()=>{pick.sp=Object.keys(SP)[Math.random()*3|0];pick.g=Math.random()<.5?'M':'F';$('#nm').value=NAMES[Math.random()*NAMES.length|0];syncPick()};
-$('#go').onclick=()=>{P=newPet($('#nm').value.trim()||NAMES[Math.random()*NAMES.length|0],pick.sp,pick.g);startGame()};
+/* ---------- ชื่อสัตว์เลี้ยงห้ามซ้ำ: เทียบกับสัตว์ตัวปัจจุบันที่ยังมีชีวิต + สัตว์ทุกตัวในคลัง (ไม่สนตัวพิมพ์เล็ก/ใหญ่ และช่องว่างซ้ำ) ---------- */
+const normName=n=>String(n==null?'':n).normalize('NFC').replace(/\s+/g,' ').trim().toLowerCase();
+window.normName=normName;
+window.nameTaken=async function(n){
+  const k=normName(n);if(!k)return false;
+  if(P&&!P.dead&&normName(P.name)===k)return true;   // ตัวที่ยังมีชีวิตอยู่ (ตัวที่ตายแล้วไม่นับ เพราะข้อมูลถูกล้างทั้งหมดก่อนเริ่มตัวใหม่)
+  if(socOn()){try{const r=await socCall('vault_get');if(r&&r.ok!==false&&Array.isArray(r.pets)&&r.pets.some(p=>normName(p.name)===k))return true}catch(e){console.warn('name check:',e)}}
+  return false};
+let goBusy=false;
+$('#go').onclick=async()=>{
+  if(goBusy)return;goBusy=true;
+  try{
+    const nm=String($('#nm').value||'').replace(/\s+/g,' ').trim()||NAMES[Math.random()*NAMES.length|0];
+    if(await window.nameTaken(nm))return toast('ชื่อนี้ซ้ำกับสัตว์เลี้ยงตัวอื่นของคุณ (ตัวที่เลี้ยงอยู่หรือในคลัง) กรุณาตั้งชื่ออื่น');
+    P=null;rt.panel=null;                              // ตัวใหม่เริ่มจากศูนย์เสมอ ไม่ว่าชื่อจะซ้ำกับตัวที่ตายไปแล้วหรือไม่
+    P=newPet(nm,pick.sp,pick.g);startGame();
+  }finally{goBusy=false}};
 async function resetEconItems(){   // รีเซ็ตไอเทมที่ server (ตาราง player_items) · ไม่ใช้กับการจุติ/เก็บเข้าคลัง
   if(!socOn())return;                 // ออฟไลน์: newPet() ให้ของเริ่มต้นอยู่แล้ว
   try{const r=await socCall('econ_reset_items');if(r&&r.ok===false)toast(r.msg||'รีเซ็ตไอเทมไม่สำเร็จ')}catch(e){console.warn('reset items:',e)}
@@ -5154,7 +5170,9 @@ window.rbOpen=()=>run(async()=>{
   B.querySelectorAll('[data-rg]').forEach(b=>b.onclick=()=>{gd=b.dataset.rg;sync()});
   B.querySelector('#rbGo').onclick=go;ov.classList.remove('hide')});
 const go=()=>run(async()=>{
-  const r=await socCall('rebirth_do',{p_name:$('#rbName').value.trim(),p_gender:gd});
+  const rbn=$('#rbName').value.replace(/\s+/g,' ').trim();
+  if(rbn&&await window.nameTaken(rbn))return toast('ชื่อนี้ซ้ำกับสัตว์ในคลัง กรุณาตั้งชื่ออื่น');
+  const r=await socCall('rebirth_do',{p_name:rbn,p_gender:gd});
   if(!r||r.ok===false)return toast((r&&r.msg)||'จุติไม่สำเร็จ');
   cloudStamp=null;const d=await load();if(!d)return toast('โหลดไข่ใหม่ไม่ได้ ลองเปิดเกมใหม่');
   P=migrate(d);P.last=Date.now();P.coins=r.coins;P.inv=Object.assign({},r.items||{});rt.panel=null;ov.classList.add('hide');
@@ -5373,6 +5391,11 @@ function readyOv(){showOv('<b style="font-size:20px">วิ่งกระโด
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
 function start(){if(!G||G.state==='run')return;newGame();G.state='run';ov.classList.add('hide');paintLb()}
 
+/* ---------- ระยะห่างสิ่งกีดขวาง: ยิ่งเร็วยิ่งถี่ (ระยะห่างเป็นพิกเซลโตช้ากว่าความเร็ว → จำนวนสิ่งกีดขวางต่อวินาทีเพิ่มขึ้น) ---------- */
+function gapFor(speed){
+  const p=Math.max(0,Math.min(1,(speed-CFG.V0)/(CFG.VEND-CFG.V0)));      // 0 = ช้าสุด · 1 = เร็วสุด
+  const base=speed*(.75-.22*p)+70-20*p, rnd=(220-80*p)*Math.random();   // ต้นเกมเท่าเดิม · ปลายเกมห่างน้อยลง
+  return Math.max(speed*.62,base+rnd)}                                    // กันตัน: ไม่ให้ห่างน้อยกว่าระยะกระโดด 1 ครั้ง (~.56 วิ) จึงกระโดดผ่านได้ต่อเนื่องเสมอ
 /* ---------- สร้างสิ่งกีดขวาง ---------- */
 function spawn(){
   const bird=G.rt>8&&Math.random()<.3;
@@ -5388,7 +5411,7 @@ function update(dt){const g=G;g.t+=dt;if(g.state!=='run')return;
   g.duck=duckHeld;
   if(jumpReq&&g.y===0){g.vy=CFG.JUMP;jumpReq=false}else if(g.y===0)jumpReq=false;
   if(g.y>0||g.vy>0){g.vy-=CFG.G*dt*(g.duck?1.8:1);g.y=Math.max(0,g.y+g.vy*dt);if(g.y===0)g.vy=0}
-  g.next-=g.speed*dt;if(g.next<=0){spawn();g.next=g.speed*.75+70+Math.random()*220}
+  g.next-=g.speed*dt;if(g.next<=0){spawn();g.next=gapFor(g.speed)}
   g.obs.forEach(o=>o.x-=g.speed*dt);g.obs=g.obs.filter(o=>o.x+o.w>-10);
   g.clouds.forEach(k=>{k.x-=g.speed*dt*.15;if(k.x<-40){k.x=W+20;k.y=10+Math.random()*40}});
   if(g.obs.some(hit))die();else if(g.rt>=CFG.DUR)die(true);
