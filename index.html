@@ -1041,7 +1041,7 @@ function unicornElecYoungSheet(){
 const uniEcAImg=new Image();let uniEcAOK=false;
 uniEcAImg.onload=()=>{uniEcAOK=true;for(const k in sheets)if(k.startsWith('unicorn2'))delete sheets[k];if(typeof drawPreviews==='function')drawPreviews()};
 uniEcAImg.src='assets/img/unielea.png';
-function uniAdultNorm(sp,st,acc){return sp==='unicorn'&&st===2&&((uniEcAOK&&acc===EL.electric.c)||(uniEaAOK&&acc===EL.earth.c))}
+function uniAdultNorm(sp,st,acc){return sp==='unicorn'&&st===2&&((uniEcAOK&&acc===EL.electric.c)||(uniEaAOK&&acc===EL.earth.c)||(uniFAOK&&acc===EL.fire.c)||(uniIcAOK&&acc===EL.ice.c))}
 function unicornElecAdultSheet(){
   const N=192,cv=document.createElement('canvas');cv.width=8*N;cv.height=7*N;
   const c=cv.getContext('2d');c.imageSmoothingEnabled=false;c.drawImage(uniEcAImg,0,0);
@@ -1061,6 +1061,32 @@ function unicornEarthAdultSheet(){
   const t=document.createElement('canvas');t.width=16;t.height=16;const tc=t.getContext('2d');   // ท่าตาย ใช้หลุมศพเดิม
   for(let f=0;f<4;f++){tc.clearRect(0,0,16,16);drawGrave(tc,'unicorn',f);c.drawImage(t,0,0,16,16,f*N+(N-96)/2,5*N+N-96,96,96)}
   cv.fr=[6,6,6,6,4,4,4];cv.lp=[null,null,4,null,null,null,null];cv.spd=[.55,.8,.8,.55,1,1,1];   // นอน: เล่น 0–3 แล้ววนเฟรม 4–5 (หายใจ)
+  cv.cell=N;cv.pix=.2;return cv}
+/* ---------- ยูนิคอร์นโตเต็มวัย ธาตุไฟ: ดีไซน์ใหม่ (ยูนิคอร์นขาว ผมและหางเป็นเปลวไฟ เขาทอง เกราะทองลายไทยประดับทับทิม มีลูกไฟและประกายลอย · หันขวา · ช่อง 192×192 · ชีต 1536×1344 · ใช้ไฟล์ assets/img/unifa.png หรือ base64)
+   แถว: 0 ยืน idle 6 (ยกกีบ/หลับตา) · 1 กิน 6 · 2 นอน 6 (ยืน→ล้มตัวนอน แล้ววนเฟรม 4–5) · 3 เดิน 6 · 4 ป่วย 4 (ย้อมโทนเขียวซีดจากท่ายืน) · 5 ตาย (หลุมศพจากโค้ด) · 6 นั่ง 4 (ใช้ท่ายืน)
+   ผ่าน normDragonSheet ให้ขนาดพอดีเหมือนมังกรโตเต็มวัย ---------- */
+const uniFAImg=new Image();let uniFAOK=false;
+uniFAImg.onload=()=>{uniFAOK=true;for(const k in sheets)if(k.startsWith('unicorn2'))delete sheets[k];if(typeof drawPreviews==='function')drawPreviews()};
+uniFAImg.src='assets/img/unifa.png';
+function unicornFireAdultSheet(){
+  const N=192,cv=document.createElement('canvas');cv.width=8*N;cv.height=7*N;
+  const c=cv.getContext('2d');c.imageSmoothingEnabled=false;c.drawImage(uniFAImg,0,0);
+  const t=document.createElement('canvas');t.width=16;t.height=16;const tc=t.getContext('2d');   // ท่าตาย ใช้หลุมศพเดิม
+  for(let f=0;f<4;f++){tc.clearRect(0,0,16,16);drawGrave(tc,'unicorn',f);c.drawImage(t,0,0,16,16,f*N+(N-96)/2,5*N+N-96,96,96)}
+  cv.fr=[6,6,6,6,4,4,4];cv.lp=[null,null,4,null,null,null,null];cv.spd=[.55,.8,.8,.55,1,1,1];   // นอน: เล่น 0–3 แล้ววนเฟรม 4–5
+  cv.cell=N;cv.pix=.2;return cv}
+/* ---------- ยูนิคอร์นโตเต็มวัย ธาตุน้ำแข็ง: ดีไซน์ใหม่ (ยูนิคอร์นขาว ผมและหางเป็นสายน้ำแข็งสีฟ้า เขาน้ำแข็ง เกราะเงินฟ้าประดับอัญมณี มีผลึกน้ำแข็งและเกล็ดหิมะลอย · หันขวา · ช่อง 192×192 · ชีต 1536×1344 · ใช้ไฟล์ assets/img/uniica.png หรือ base64)
+   แถว: 0 ยืน idle 6 (ยกกีบ/หลับตา/ผลึกน้ำแข็งระเบิดเฟรมท้าย) · 1 กิน 6 · 2 นอน 6 (ยืน→ล้มตัวนอน แล้ววนเฟรม 4–5) · 3 เดิน 6 · 4 ป่วย 4 (ย้อมโทนเขียวซีดจากท่ายืน) · 5 ตาย (หลุมศพจากโค้ด) · 6 นั่ง 4 (ใช้ท่ายืน)
+   ผ่าน normDragonSheet ให้ขนาดพอดีเหมือนมังกรโตเต็มวัย ---------- */
+const uniIcAImg=new Image();let uniIcAOK=false;
+uniIcAImg.onload=()=>{uniIcAOK=true;for(const k in sheets)if(k.startsWith('unicorn2'))delete sheets[k];if(typeof drawPreviews==='function')drawPreviews()};
+uniIcAImg.src='assets/img/uniica.png';
+function unicornIceAdultSheet(){
+  const N=192,cv=document.createElement('canvas');cv.width=8*N;cv.height=7*N;
+  const c=cv.getContext('2d');c.imageSmoothingEnabled=false;c.drawImage(uniIcAImg,0,0);
+  const t=document.createElement('canvas');t.width=16;t.height=16;const tc=t.getContext('2d');   // ท่าตาย ใช้หลุมศพเดิม
+  for(let f=0;f<4;f++){tc.clearRect(0,0,16,16);drawGrave(tc,'unicorn',f);c.drawImage(t,0,0,16,16,f*N+(N-96)/2,5*N+N-96,96,96)}
+  cv.fr=[6,6,6,6,4,4,4];cv.lp=[null,null,4,null,null,null,null];cv.spd=[.55,.8,.8,.55,1,1,1];   // นอน: เล่น 0–3 แล้ววนเฟรม 4–5
   cv.cell=N;cv.pix=.2;return cv}
 /* ---------- ยูนิคอร์นวัยรุ่น ธาตุน้ำแข็ง: ดีไซน์ใหม่ (ยูนิคอร์นขาว ผมและหางเป็นน้ำแข็งสีฟ้า เขาและเกราะเงินประดับอัญมณีม่วง มีผลึกน้ำแข็งและเกล็ดหิมะลอย · หันขวา · ช่อง 80×80 · ชีต 640×560)
    แถว: 0 ยืน idle 6 · 1 กิน 6 · 2 นอน 6 (ยืน→ง่วง→ล้มตัวนอน แล้ววนเฟรม 4–5 มี Zz) · 3 เดิน 6 · 4 ป่วย 4 (ย้อมโทนเขียวซีดจากท่ายืน) · 5 ตาย (หลุมศพจากโค้ด) · 6 นั่ง 4 (ใช้ท่ายืน) ---------- */
@@ -1545,6 +1571,8 @@ function getSheet(sp,st,form,acc){
   if(sp==='slime'&&st===1&&slShadYOK&&acc===EL.shadow.c)return sheets[k]=slimeShadYoungSheet();   // สไลม์วัยรุ่นธาตุเงา: ดีไซน์ใหม่
   if(sp==='slime'&&st===1)return sheets[k]=slimeYoungSheet(acc);   // สไลม์วัยรุ่น: ยืนสองขา (ย้อมสีตามธาตุ)
   if(sp==='unicorn'&&st===0&&uniBOK)return sheets[k]=unicornBabySheet();   // ยูนิคอร์นวัยเด็ก: ดีไซน์ใหม่
+  if(sp==='unicorn'&&st===2&&uniIcAOK&&acc===EL.ice.c)return sheets[k]=unicornIceAdultSheet();   // ยูนิคอร์นโตเต็มวัยธาตุน้ำแข็ง: ดีไซน์ใหม่
+  if(sp==='unicorn'&&st===2&&uniFAOK&&acc===EL.fire.c)return sheets[k]=unicornFireAdultSheet();   // ยูนิคอร์นโตเต็มวัยธาตุไฟ: ดีไซน์ใหม่
   if(sp==='unicorn'&&st===2&&uniEcAOK&&acc===EL.electric.c)return sheets[k]=unicornElecAdultSheet();   // ยูนิคอร์นผู้ใหญ่ธาตุไฟฟ้า: ดีไซน์ใหม่
   if(sp==='unicorn'&&st===2&&uniEaAOK&&acc===EL.earth.c)return sheets[k]=unicornEarthAdultSheet();   // ยูนิคอร์นผู้ใหญ่ธาตุดิน: ดีไซน์ใหม่
   if(sp==='unicorn'&&st===1&&uniEcYOK&&acc===EL.electric.c)return sheets[k]=unicornElecYoungSheet();   // ยูนิคอร์นวัยรุ่นธาตุไฟฟ้า: ดีไซน์ใหม่
