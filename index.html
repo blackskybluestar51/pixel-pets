@@ -1041,7 +1041,7 @@ function unicornElecYoungSheet(){
 const uniEcAImg=new Image();let uniEcAOK=false;
 uniEcAImg.onload=()=>{uniEcAOK=true;for(const k in sheets)if(k.startsWith('unicorn2'))delete sheets[k];if(typeof drawPreviews==='function')drawPreviews()};
 uniEcAImg.src='assets/img/unielea.png';
-function uniAdultNorm(sp,st,acc){return sp==='unicorn'&&st===2&&((uniEcAOK&&acc===EL.electric.c)||(uniEaAOK&&acc===EL.earth.c)||(uniFAOK&&acc===EL.fire.c)||(uniIcAOK&&acc===EL.ice.c)||(uniLAOK&&acc===EL.light.c)||(uniNAOK&&acc===EL.nature.c)||(uniWAOK&&acc===EL.water.c)||(uniSAOK&&acc===EL.shadow.c))}
+function uniAdultNorm(sp,st,acc){return sp==='unicorn'&&((st===3&&uniWAscOK&&acc===EL.water.c)||st===2&&((uniEcAOK&&acc===EL.electric.c)||(uniEaAOK&&acc===EL.earth.c)||(uniFAOK&&acc===EL.fire.c)||(uniIcAOK&&acc===EL.ice.c)||(uniLAOK&&acc===EL.light.c)||(uniNAOK&&acc===EL.nature.c)||(uniWAOK&&acc===EL.water.c)||(uniSAOK&&acc===EL.shadow.c)))}
 function unicornElecAdultSheet(){
   const N=192,cv=document.createElement('canvas');cv.width=8*N;cv.height=7*N;
   const c=cv.getContext('2d');c.imageSmoothingEnabled=false;c.drawImage(uniEcAImg,0,0);
@@ -1126,6 +1126,19 @@ function unicornWaterAdultSheet(){
   const t=document.createElement('canvas');t.width=16;t.height=16;const tc=t.getContext('2d');   // ท่าตาย ใช้หลุมศพเดิม
   for(let f=0;f<4;f++){tc.clearRect(0,0,16,16);drawGrave(tc,'unicorn',f);c.drawImage(t,0,0,16,16,f*N+(N-96)/2,5*N+N-96,96,96)}
   cv.fr=[6,6,6,6,4,4,4];cv.lp=[null,null,4,null,null,null,null];cv.spd=[.55,.8,.8,.55,1,1,1];   // นอน: เล่น 0–3 แล้ววนเฟรม 4–5
+  cv.cell=N;cv.pix=.2;return cv}
+/* ---------- ยูนิคอร์น Ascended ธาตุน้ำ: ดีไซน์ใหม่ (ยูนิคอร์นขาวเกราะเงินประดับไพลินฟ้า ผมและหางเป็นสายน้ำ มีฟองน้ำและกระแสน้ำวนล้อมตัว · หันขวา · ช่อง 192×192 · ชีต 1536×1344 · ใช้ไฟล์ assets/img/uniwasc.png)
+   แถว: 0 ยืน idle 6 (ยกกีบ/หลับตา → กระแสน้ำพุ่งวนรอบตัว) · 1 กิน 6 (มีเฟรมอ้าปาก/เคี้ยว) · 2 นอน 6 (ยืน→ล้มตัวนอน แล้ววนเฟรม 4–5 มีคลื่นน้ำรอบตัว) · 3 เดิน 6 · 4 ป่วย 4 (ย้อมโทนเขียวซีดจากท่ายืน) · 5 ตาย (หลุมศพจากโค้ด) · 6 นั่ง 4 (ใช้ท่ายืน)
+   ผ่าน normDragonSheet ให้ขนาดพอดีฉากเหมือนยูนิคอร์นโตเต็มวัย ---------- */
+const uniWAscImg=new Image();let uniWAscOK=false;
+uniWAscImg.onload=()=>{uniWAscOK=true;for(const k in sheets)if(k.startsWith('unicorn3'))delete sheets[k];if(typeof drawPreviews==='function')drawPreviews()};
+uniWAscImg.src='assets/img/uniwasc.png';
+function unicornWaterAscSheet(){
+  const N=192,cv=document.createElement('canvas');cv.width=8*N;cv.height=7*N;
+  const c=cv.getContext('2d');c.imageSmoothingEnabled=false;c.drawImage(uniWAscImg,0,0);
+  const t=document.createElement('canvas');t.width=16;t.height=16;const tc=t.getContext('2d');   // ท่าตาย ใช้หลุมศพเดิม
+  for(let f=0;f<4;f++){tc.clearRect(0,0,16,16);drawGrave(tc,'unicorn',f);c.drawImage(t,0,0,16,16,f*N+(N-96)/2,5*N+N-96,96,96)}
+  cv.fr=[6,6,6,6,4,4,4];cv.lp=[null,null,4,null,null,null,null];cv.spd=[.5,.8,.8,.55,1,1,1];   // นอน: เล่น 0–3 แล้ววนเฟรม 4–5
   cv.cell=N;cv.pix=.2;return cv}
 /* ---------- ยูนิคอร์นโตเต็มวัย ธาตุเงา: ดีไซน์ใหม่ (ยูนิคอร์นขาวอมม่วง ผมและหางเป็นเปลวเงาสีม่วงเข้ม มีเปลวฟ้าเขียวที่ปลาย เขาและเกราะเงินประดับอัญมณีม่วง · หันขวา · ช่อง 192×192 · ชีต 1536×1344 · ใช้ไฟล์ assets/img/unisa.png หรือ base64)
    แถว: 0 ยืน idle 6 (ยกกีบ/หลับตา) · 1 กิน 6 (มีเฟรมอ้าปาก) · 2 นอน 6 (ยืน→ล้มตัวนอน แล้ววนเฟรม 4–5) · 3 เดิน 6 · 4 ป่วย 4 (ย้อมโทนเขียวซีดจากท่ายืน) · 5 ตาย (หลุมศพจากโค้ด) · 6 นั่ง 4 (ใช้ท่ายืน)
@@ -1623,6 +1636,7 @@ function getSheet(sp,st,form,acc){
   if(sp==='slime'&&st===1&&slShadYOK&&acc===EL.shadow.c)return sheets[k]=slimeShadYoungSheet();   // สไลม์วัยรุ่นธาตุเงา: ดีไซน์ใหม่
   if(sp==='slime'&&st===1)return sheets[k]=slimeYoungSheet(acc);   // สไลม์วัยรุ่น: ยืนสองขา (ย้อมสีตามธาตุ)
   if(sp==='unicorn'&&st===0&&uniBOK)return sheets[k]=unicornBabySheet();   // ยูนิคอร์นวัยเด็ก: ดีไซน์ใหม่
+  if(sp==='unicorn'&&st===3&&uniWAscOK&&acc===EL.water.c)return sheets[k]=unicornWaterAscSheet();   // ยูนิคอร์น Ascended ธาตุน้ำ: ดีไซน์ใหม่
   if(sp==='unicorn'&&st===2&&uniSAOK&&acc===EL.shadow.c)return sheets[k]=unicornShadowAdultSheet();   // ยูนิคอร์นโตเต็มวัยธาตุเงา: ดีไซน์ใหม่
   if(sp==='unicorn'&&st===2&&uniWAOK&&acc===EL.water.c)return sheets[k]=unicornWaterAdultSheet();   // ยูนิคอร์นโตเต็มวัยธาตุน้ำ: ดีไซน์ใหม่
   if(sp==='unicorn'&&st===2&&uniNAOK&&acc===EL.nature.c)return sheets[k]=unicornNatureAdultSheet();   // ยูนิคอร์นโตเต็มวัยธาตุธรรมชาติ: ดีไซน์ใหม่
